@@ -46,8 +46,6 @@ enum
   PROP_CACHE
 };
 
-typedef struct _ChamplainTileSourcePrivate ChamplainTileSourcePrivate;
-
 struct _ChamplainTileSourcePrivate
 {
   gchar *id;
@@ -72,11 +70,11 @@ static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
 
 static void
 champlain_tile_source_get_property (GObject *object,
-                                    guint prop_id,
-                                    GValue *value,
-                                    GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainTileSourcePrivate *priv = CHAMPLAIN_TILE_SOURCE (object)->priv;
 
   switch (prop_id)
     {
@@ -114,28 +112,28 @@ champlain_tile_source_get_property (GObject *object,
 
 static void
 champlain_tile_source_set_property (GObject *object,
-                                    guint prop_id,
-                                    const GValue *value,
-                                    GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
-  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(object);
+  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (object);
 
   switch (prop_id)
     {
     case PROP_ID:
       champlain_tile_source_set_id (tile_source,
-                                    g_value_get_string (value));
+          g_value_get_string (value));
     case PROP_NAME:
       champlain_tile_source_set_name (tile_source,
-                                      g_value_get_string (value));
+          g_value_get_string (value));
       break;
     case PROP_LICENSE:
       champlain_tile_source_set_license (tile_source,
-                                         g_value_get_string (value));
+          g_value_get_string (value));
       break;
     case PROP_LICENSE_URI:
       champlain_tile_source_set_license_uri (tile_source,
-                                             g_value_get_string (value));
+          g_value_get_string (value));
       break;
     case PROP_MIN_ZOOM_LEVEL:
       champlain_tile_source_set_min_zoom_level (tile_source,
@@ -147,15 +145,15 @@ champlain_tile_source_set_property (GObject *object,
       break;
     case PROP_TILE_SIZE:
       champlain_tile_source_set_tile_size (tile_source,
-                                           g_value_get_uint (value));
+          g_value_get_uint (value));
       break;
     case PROP_MAP_PROJECTION:
       champlain_tile_source_set_projection (tile_source,
-                                            g_value_get_enum (value));
+          g_value_get_enum (value));
       break;
     case PROP_CACHE:
       champlain_tile_source_set_cache (tile_source,
-                                       g_value_get_object (value));
+          g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -165,7 +163,7 @@ champlain_tile_source_set_property (GObject *object,
 static void
 champlain_tile_source_dispose (GObject *object)
 {
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainTileSourcePrivate *priv = CHAMPLAIN_TILE_SOURCE (object)->priv;
 
   if (priv->cache)
     {
@@ -180,7 +178,7 @@ champlain_tile_source_dispose (GObject *object)
 static void
 champlain_tile_source_finalize (GObject *object)
 {
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainTileSourcePrivate *priv = CHAMPLAIN_TILE_SOURCE (object)->priv;
 
   g_free (priv->id);
   g_free (priv->name);
@@ -230,10 +228,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_string ("id",
-                               "Id",
-                               "The id of the tile source",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Id",
+      "The id of the tile source",
+      "",
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_ID, pspec);
 
   /**
@@ -244,10 +242,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_string ("name",
-                               "Name",
-                               "The name of the tile source",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Name",
+      "The name of the tile source",
+      "",
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_NAME, pspec);
 
   /**
@@ -258,10 +256,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_string ("license",
-                               "License",
-                               "The usage license of the tile source",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "License",
+      "The usage license of the tile source",
+      "",
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_LICENSE, pspec);
 
   /**
@@ -272,10 +270,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_string ("license-uri",
-                               "License-uri",
-                               "The usage license's uri for more information",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "License-uri",
+      "The usage license's uri for more information",
+      "",
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_LICENSE_URI, pspec);
 
   /**
@@ -286,12 +284,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_uint ("min-zoom-level",
-                             "Minimum Zoom Level",
-                             "The minimum zoom level",
-                             0,
-                             50,
-                             0,
-                             (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Minimum Zoom Level",
+      "The minimum zoom level",
+      0,
+      50,
+      0,
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MIN_ZOOM_LEVEL, pspec);
 
   /**
@@ -302,12 +300,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_uint ("max-zoom-level",
-                             "Maximum Zoom Level",
-                             "The maximum zoom level",
-                             0,
-                             50,
-                             18,
-                             (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Maximum Zoom Level",
+      "The maximum zoom level",
+      0,
+      50,
+      18,
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAX_ZOOM_LEVEL, pspec);
 
   /**
@@ -318,12 +316,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_uint ("tile-size",
-                             "Tile Size",
-                             "The tile size",
-                             0,
-                             2048,
-                             256,
-                             (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Tile Size",
+      "The tile size",
+      0,
+      2048,
+      256,
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
@@ -334,11 +332,11 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_enum ("projection",
-                             "Projection",
-                             "The map projection",
-                             CHAMPLAIN_TYPE_MAP_PROJECTION,
-                             CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-                             (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "Projection",
+      "The map projection",
+      CHAMPLAIN_TYPE_MAP_PROJECTION,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
   /**
@@ -349,10 +347,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   * Since: 0.6
   */
   pspec = g_param_spec_object ("cache",
-                               "Cache",
-                               "Cache used for tile sorage",
-                               CHAMPLAIN_TYPE_TILE_CACHE,
-                               G_PARAM_READWRITE);
+      "Cache",
+      "Cache used for tile sorage",
+      CHAMPLAIN_TYPE_TILE_CACHE,
+      G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_CACHE, pspec);
 }
 
@@ -360,6 +358,9 @@ static void
 champlain_tile_source_init (ChamplainTileSource *tile_source)
 {
   ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+
+  tile_source->priv = priv;
+
   priv->cache = NULL;
   priv->id = NULL;
   priv->name = NULL;
@@ -386,8 +387,7 @@ champlain_tile_source_get_cache (ChamplainTileSource *tile_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->cache;
+  return tile_source->priv->cache;
 }
 
 /**
@@ -401,11 +401,11 @@ champlain_tile_source_get_cache (ChamplainTileSource *tile_source)
  */
 void
 champlain_tile_source_set_cache (ChamplainTileSource *tile_source,
-                                 ChamplainTileCache *cache)
+    ChamplainTileCache *cache)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = tile_source->priv;
 
   if (priv->cache != NULL)
     g_object_unref (priv->cache);
@@ -427,8 +427,7 @@ get_id (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), NULL);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->id;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->id;
 }
 
 static const gchar *
@@ -436,8 +435,7 @@ get_name (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), NULL);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->name;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->name;
 }
 
 static const gchar *
@@ -445,8 +443,7 @@ get_license (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), NULL);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->license;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->license;
 }
 
 static const gchar *
@@ -454,8 +451,7 @@ get_license_uri (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), NULL);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->license_uri;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->license_uri;
 }
 
 static guint
@@ -463,8 +459,7 @@ get_min_zoom_level (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), 0);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->min_zoom_level;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->min_zoom_level;
 }
 
 static guint
@@ -472,8 +467,7 @@ get_max_zoom_level (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), 0);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->max_zoom_level;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->max_zoom_level;
 }
 
 static guint
@@ -481,8 +475,7 @@ get_tile_size (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), 0);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->tile_size;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->tile_size;
 }
 
 static ChamplainMapProjection
@@ -490,8 +483,7 @@ get_projection (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_SOURCE (map_source), 0);
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->map_projection;
+  return CHAMPLAIN_TILE_SOURCE (map_source)->priv->map_projection;
 }
 
 /**
@@ -505,11 +497,11 @@ get_projection (ChamplainMapSource *map_source)
  */
 void
 champlain_tile_source_set_id (ChamplainTileSource *tile_source,
-                              const gchar *id)
+    const gchar *id)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->id);
   priv->id = g_strdup (id);
@@ -528,11 +520,11 @@ champlain_tile_source_set_id (ChamplainTileSource *tile_source,
  */
 void
 champlain_tile_source_set_name (ChamplainTileSource *tile_source,
-                                const gchar *name)
+    const gchar *name)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->name);
   priv->name = g_strdup (name);
@@ -551,11 +543,11 @@ champlain_tile_source_set_name (ChamplainTileSource *tile_source,
  */
 void
 champlain_tile_source_set_license (ChamplainTileSource *tile_source,
-                                   const gchar *license)
+    const gchar *license)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->license);
   priv->license = g_strdup (license);
@@ -574,11 +566,11 @@ champlain_tile_source_set_license (ChamplainTileSource *tile_source,
  */
 void
 champlain_tile_source_set_license_uri (ChamplainTileSource *tile_source,
-                                       const gchar *license_uri)
+    const gchar *license_uri)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->license_uri);
   priv->license_uri = g_strdup (license_uri);
@@ -601,9 +593,7 @@ champlain_tile_source_set_min_zoom_level (ChamplainTileSource *tile_source,
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->min_zoom_level = zoom_level;
+  tile_source->priv->min_zoom_level = zoom_level;
 
   g_object_notify (G_OBJECT (tile_source), "min-zoom-level");
 }
@@ -623,9 +613,7 @@ champlain_tile_source_set_max_zoom_level (ChamplainTileSource *tile_source,
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->max_zoom_level = zoom_level;
+  tile_source->priv->max_zoom_level = zoom_level;
 
   g_object_notify (G_OBJECT (tile_source), "max-zoom-level");
 }
@@ -641,13 +629,11 @@ champlain_tile_source_set_max_zoom_level (ChamplainTileSource *tile_source,
  */
 void
 champlain_tile_source_set_tile_size (ChamplainTileSource *tile_source,
-                                     guint tile_size)
+    guint tile_size)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->tile_size = tile_size;
+  tile_source->priv->tile_size = tile_size;
 
   g_object_notify (G_OBJECT (tile_source), "tile-size");
 }
@@ -663,13 +649,11 @@ champlain_tile_source_set_tile_size (ChamplainTileSource *tile_source,
  */
 void
 champlain_tile_source_set_projection (ChamplainTileSource *tile_source,
-                                      ChamplainMapProjection projection)
+    ChamplainMapProjection projection)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->map_projection = projection;
+  tile_source->priv->map_projection = projection;
 
   g_object_notify (G_OBJECT (tile_source), "projection");
 }

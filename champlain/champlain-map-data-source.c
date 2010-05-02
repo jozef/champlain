@@ -49,8 +49,6 @@ enum
   PROP_STATE
 };
 
-typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
-
 struct _ChamplainMapDataSourcePrivate {
   ChamplainBoundingBox *bounding_box;
   /* the area that is covered by this data source */
@@ -65,7 +63,7 @@ champlain_map_data_source_get_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
-  ChamplainMapDataSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMapDataSourcePrivate *priv = self->priv;
 
   switch (property_id)
     {
@@ -87,7 +85,7 @@ champlain_map_data_source_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
-  ChamplainMapDataSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMapDataSourcePrivate *priv = self->priv;
 
   switch (property_id)
     {
@@ -114,7 +112,7 @@ static void
 champlain_map_data_source_finalize (GObject *object)
 {
   ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
+  ChamplainMapDataSourcePrivate *priv =  self->priv;
 
   champlain_bounding_box_free (priv->bounding_box);
 
@@ -171,7 +169,7 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
            "map data source's state",
            "The state of the map data source",
            CHAMPLAIN_TYPE_STATE,
-           CHAMPLAIN_STATE_INIT,
+           CHAMPLAIN_STATE_NONE,
            G_PARAM_READWRITE));
 }
 
@@ -180,13 +178,15 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
 {
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
 
+  self->priv = priv;
+
   priv->bounding_box = champlain_bounding_box_new ();
   priv->bounding_box->left = 0.0;
   priv->bounding_box->bottom = 0.0;
   priv->bounding_box->right = 0.0;
   priv->bounding_box->top = 0.0;
 
-  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->state = CHAMPLAIN_STATE_NONE;
 }
 
 /**

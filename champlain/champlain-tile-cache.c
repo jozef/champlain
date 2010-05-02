@@ -27,7 +27,7 @@
 
 #include "champlain-tile-cache.h"
 
-G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOURCE);
+G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOURCE)
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
 
@@ -36,8 +36,6 @@ enum
   PROP_0,
   PROP_PERSISTENT_CACHE
 };
-
-typedef struct _ChamplainTileCachePrivate ChamplainTileCachePrivate;
 
 struct _ChamplainTileCachePrivate
 {
@@ -55,9 +53,9 @@ static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
 
 static void
 champlain_tile_cache_get_property (GObject *object,
-                                   guint property_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE (object);
 
@@ -73,11 +71,11 @@ champlain_tile_cache_get_property (GObject *object,
 
 static void
 champlain_tile_cache_set_property (GObject *object,
-                                   guint property_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
-  ChamplainTileCachePrivate *priv = GET_PRIVATE (object);
+  ChamplainTileCachePrivate *priv = CHAMPLAIN_TILE_CACHE (object)->priv;
 
   switch (property_id)
     {
@@ -160,6 +158,8 @@ champlain_tile_cache_init (ChamplainTileCache *tile_cache)
 {
   ChamplainTileCachePrivate *priv = GET_PRIVATE (tile_cache);
 
+  tile_cache->priv = priv;
+
   priv->persistent = TRUE;
 }
 
@@ -178,8 +178,7 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache), FALSE);
 
-  ChamplainTileCachePrivate *priv = GET_PRIVATE(tile_cache);
-  return priv->persistent;
+  return tile_cache->priv->persistent;
 }
 
 /**
@@ -195,13 +194,13 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
  */
 void
 champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
-                                 ChamplainTile *tile,
-                                 const gchar *contents,
-                                 gsize size)
+    ChamplainTile *tile,
+    const gchar *contents,
+    gsize size)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
-  return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->store_tile (tile_cache, tile, contents, size);
+  CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->store_tile (tile_cache, tile, contents, size);
 }
 
 /**
@@ -214,11 +213,12 @@ champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
  * Since: 0.6
  */
 void
-champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
-  return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->refresh_tile_time (tile_cache, tile);
+  CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->refresh_tile_time (tile_cache, tile);
 }
 
 /**
@@ -237,11 +237,12 @@ champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, Champlai
  * Since: 0.6
  */
 void
-champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
-  return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->on_tile_filled (tile_cache, tile);
+  CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->on_tile_filled (tile_cache, tile);
 }
 
 /**
@@ -258,7 +259,7 @@ champlain_tile_cache_clean (ChamplainTileCache *tile_cache)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
-  return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->clean (tile_cache);
+  CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->clean (tile_cache);
 }
 
 static const gchar *

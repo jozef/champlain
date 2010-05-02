@@ -25,7 +25,6 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-tile.h>
-#include <champlain/champlain-zoom-level.h>
 
 G_BEGIN_DECLS
 
@@ -35,6 +34,8 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_MAP_SOURCE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE))
 #define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE))
 #define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
+
+typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
 
 typedef struct _ChamplainMapSourceClass ChamplainMapSourceClass;
 
@@ -46,6 +47,8 @@ typedef enum
 struct _ChamplainMapSource
 {
   GInitiallyUnowned parent_instance;
+
+  ChamplainMapSourcePrivate *priv;
 };
 
 struct _ChamplainMapSourceClass
@@ -85,11 +88,11 @@ guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
 ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
-                                  guint zoom_level,
-                                  gdouble longitude);
+    guint zoom_level,
+    gdouble longitude);
 guint champlain_map_source_get_y (ChamplainMapSource *map_source,
-                                  guint zoom_level,
-                                  gdouble latitude);
+    guint zoom_level,
+    gdouble latitude);
 gdouble champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     guint zoom_level,
     guint x);
@@ -106,7 +109,7 @@ gdouble champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_sourc
     gdouble longitude);
 
 void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
-                                     ChamplainTile *tile);
+    ChamplainTile *tile);
 
 G_END_DECLS
 

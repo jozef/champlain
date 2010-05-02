@@ -44,7 +44,6 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-zoom-level.h"
 
 #include <errno.h>
 #include <gdk/gdk.h>
@@ -73,8 +72,6 @@ G_DEFINE_TYPE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPL
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, ChamplainNetworkTileSourcePrivate))
 
-typedef struct _ChamplainNetworkTileSourcePrivate ChamplainNetworkTileSourcePrivate;
-
 struct _ChamplainNetworkTileSourcePrivate
 {
   gboolean offline;
@@ -89,14 +86,20 @@ typedef struct
   ChamplainTile *tile;
 } TileLoadedCallbackData;
 
+typedef struct
+{
+  ChamplainMapSource *map_source;
+  SoupMessage *msg;
+} TileDestroyedCbData;
+
 static void fill_tile (ChamplainMapSource *map_source,
                        ChamplainTile *tile);
 
 static gchar *
 get_tile_uri (ChamplainNetworkTileSource *source,
-              gint x,
-              gint y,
-              gint z);
+    gint x,
+    gint y,
+    gint z);
 
 static void
 champlain_network_tile_source_get_property (GObject *object,
@@ -104,7 +107,7 @@ champlain_network_tile_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (object)->priv;
 
   switch (prop_id)
     {
@@ -146,13 +149,17 @@ champlain_network_tile_source_set_property (GObject *object,
     }
 }
 
+
 static void
 champlain_network_tile_source_dispose (GObject *object)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (object)->priv;
 
   if (priv->soup_session)
+  {
     soup_session_abort (priv->soup_session);
+    priv->soup_session = NULL;
+  }
 
   G_OBJECT_CLASS (champlain_network_tile_source_parent_class)->dispose (object);
 }
@@ -160,7 +167,7 @@ champlain_network_tile_source_dispose (GObject *object)
 static void
 champlain_network_tile_source_finalize (GObject *object)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE(object)->priv;
 
   g_free (priv->uri_format);
   g_free (priv->proxy_uri);
@@ -199,10 +206,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   * Since: 0.4
   */
   pspec = g_param_spec_string ("uri-format",
-                               "URI Format",
-                               "The URI format",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+      "URI Format",
+      "The URI format",
+      "",
+      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
   /**
@@ -213,10 +220,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   * Since: 0.4
   */
   pspec = g_param_spec_boolean ("offline",
-                                "Offline",
-                                "Offline",
-                                FALSE,
-                                G_PARAM_READWRITE);
+      "Offline",
+      "Offline",
+      FALSE,
+      G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
   /**
@@ -227,10 +234,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   * Since: 0.4
   */
   pspec = g_param_spec_string ("proxy-uri",
-                               "Proxy URI",
-                               "The proxy URI to use to access network",
-                               "",
-                               G_PARAM_READWRITE);
+      "Proxy URI",
+      "The proxy URI to use to access network",
+      "",
+      G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_PROXY_URI, pspec);
 }
 
@@ -238,6 +245,8 @@ static void
 champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 {
   ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+
+  tile_source->priv = priv;
 
   priv->proxy_uri = NULL;
   priv->uri_format = NULL;
@@ -250,8 +259,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 #endif
                          NULL);
   g_object_set (G_OBJECT (priv->soup_session),
-                "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
-                "max-conns-per-host", 2, NULL); // This is as required by OSM
+      "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
+      "max-conns-per-host", 2, NULL); // This is as required by OSM
 
 }
 
@@ -275,21 +284,21 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
  */
 ChamplainNetworkTileSource*
 champlain_network_tile_source_new_full (const gchar *id,
-                                        const gchar *name,
-                                        const gchar *license,
-                                        const gchar *license_uri,
-                                        guint min_zoom,
-                                        guint max_zoom,
-                                        guint tile_size,
-                                        ChamplainMapProjection projection,
-                                        const gchar *uri_format)
+    const gchar *name,
+    const gchar *license,
+    const gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
+    const gchar *uri_format)
 {
   ChamplainNetworkTileSource * source;
   source = g_object_new (CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, "id", id,
-                         "name", name, "license", license, "license-uri", license_uri,
-                         "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
-                         "tile-size", tile_size, "projection", projection,
-                         "uri-format", uri_format, NULL);
+      "name", name, "license", license, "license-uri", license_uri,
+      "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
+      "tile-size", tile_size, "projection", projection,
+      "uri-format", uri_format, NULL);
   return source;
 }
 
@@ -309,8 +318,7 @@ champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_s
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->uri_format;
+  return tile_source->priv->uri_format;
 }
 
 /**
@@ -334,7 +342,7 @@ champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_s
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->uri_format);
   priv->uri_format = g_strdup (uri_format);
@@ -357,8 +365,7 @@ champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_so
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->proxy_uri;
+  return tile_source->priv->proxy_uri;
 }
 
 /**
@@ -376,7 +383,7 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
   SoupURI *uri = NULL;
 
   g_free (priv->proxy_uri);
@@ -411,8 +418,7 @@ champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *tile_sour
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), FALSE);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->offline;
+  return tile_source->priv->offline;
 }
 
 /**
@@ -430,21 +436,19 @@ champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_sour
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->offline = offline;
+  tile_source->priv->offline = offline;
 
   g_object_notify (G_OBJECT (tile_source), "offline");
 }
 
 #define SIZE 8
 static gchar *
-get_tile_uri (ChamplainNetworkTileSource *source,
-              gint x,
-              gint y,
-              gint z)
+get_tile_uri (ChamplainNetworkTileSource *tile_source,
+    gint x,
+    gint y,
+    gint z)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   gchar **tokens;
   gchar *token;
@@ -486,9 +490,32 @@ get_tile_uri (ChamplainNetworkTileSource *source,
 }
 
 static void
+tile_destroyed_cb (ChamplainTile *tile,
+    TileDestroyedCbData *data)
+{
+  if (data->map_source && data->msg)
+    {
+      DEBUG ("Canceling tile download");
+      ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (data->map_source)->priv;
+
+      soup_session_cancel_message (priv->soup_session, data->msg, SOUP_STATUS_CANCELLED);
+    }
+}
+
+static void
+destroy_cb_data (TileDestroyedCbData *data,
+    GClosure *closure)
+{
+  if (data->map_source)
+    g_object_remove_weak_pointer(G_OBJECT (data->map_source), (gpointer*)&data->map_source);
+
+  g_free (data);
+}
+
+static void
 tile_loaded_cb (SoupSession *session,
-                SoupMessage *msg,
-                gpointer user_data)
+    SoupMessage *msg,
+    gpointer user_data)
 {
   TileLoadedCallbackData *callback_data = (TileLoadedCallbackData *)user_data;
   ChamplainMapSource *map_source = callback_data->map_source;
@@ -496,22 +523,26 @@ tile_loaded_cb (SoupSession *session,
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainTile *tile = callback_data->tile;
-  GdkPixbufLoader* loader;
+  GdkPixbufLoader* loader = NULL;
   GError *error = NULL;
   ClutterActor *actor;
   const gchar *etag;
+
+  if (tile)
+    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
 
   g_free (user_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
-  if (msg->status_code == SOUP_STATUS_CANCELLED)
+  if (!tile || msg->status_code == SOUP_STATUS_CANCELLED)
     {
-      DEBUG ("Download of tile %d, %d got cancelled",
-             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
-      //champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      if (!tile)
+        DEBUG ("Tile destroyed while loading");
+      else
+        DEBUG ("Download of tile %d, %d got cancelled",
+               champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 
-      g_object_unref (tile);
       g_object_unref (map_source);
       return;
     }
@@ -546,7 +577,7 @@ tile_loaded_cb (SoupSession *session,
           g_error_free (error);
         }
 
-      goto load_next_cleanup;
+      goto load_next;
     }
 
   gdk_pixbuf_loader_close (loader, &error);
@@ -554,7 +585,7 @@ tile_loaded_cb (SoupSession *session,
     {
       g_warning ("Unable to close the pixbuf loader: %s", error->message);
       g_error_free (error);
-      goto load_next_cleanup;
+      goto load_next;
     }
 
   /* Verify if the server sent an etag and save it */
@@ -571,14 +602,14 @@ tile_loaded_cb (SoupSession *session,
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
   actor = clutter_texture_new ();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
-                                          gdk_pixbuf_get_pixels (pixbuf),
-                                          gdk_pixbuf_get_has_alpha (pixbuf),
-                                          gdk_pixbuf_get_width (pixbuf),
-                                          gdk_pixbuf_get_height (pixbuf),
-                                          gdk_pixbuf_get_rowstride (pixbuf),
-                                          gdk_pixbuf_get_bits_per_sample (pixbuf) *
-                                          gdk_pixbuf_get_n_channels (pixbuf) / 8,
-                                          0, &error))
+           gdk_pixbuf_get_pixels (pixbuf),
+           gdk_pixbuf_get_has_alpha (pixbuf),
+           gdk_pixbuf_get_width (pixbuf),
+           gdk_pixbuf_get_height (pixbuf),
+           gdk_pixbuf_get_rowstride (pixbuf),
+           gdk_pixbuf_get_bits_per_sample (pixbuf) *
+           gdk_pixbuf_get_n_channels (pixbuf) / 8,
+           0, &error))
     {
       if (error)
         {
@@ -587,41 +618,38 @@ tile_loaded_cb (SoupSession *session,
         }
 
       g_object_unref (actor);
-      goto load_next_cleanup;
+      goto load_next;
     }
 
-  champlain_tile_set_content (tile, actor, TRUE);
-  champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
+  champlain_tile_set_fade_in (tile, TRUE);
+  champlain_tile_set_content (tile, actor);
 
   goto finish;
 
-load_next_cleanup:
-  g_object_unref (loader);
-
 load_next:
+  if (loader)
+    g_object_unref (loader);
   if (next_source)
-    {
-      champlain_map_source_fill_tile (next_source, tile);
-    }
-  g_object_unref (tile);
+    champlain_map_source_fill_tile (next_source, tile);
   g_object_unref (map_source);
   return;
 
 finish:
+  if (loader)
+    g_object_unref (loader);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-  g_object_unref (tile);
   g_object_unref (map_source);
 }
 
 static void
 fill_tile (ChamplainMapSource *map_source,
-           ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
   ChamplainNetworkTileSource *tile_source = CHAMPLAIN_NETWORK_TILE_SOURCE (map_source);
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   if (!priv->offline)
     {
@@ -651,31 +679,38 @@ fill_tile (ChamplainMapSource *map_source,
             {
               DEBUG("If-None-Match: %s", etag);
               soup_message_headers_append (msg->request_headers,
-                                           "If-None-Match", etag);
+                  "If-None-Match", etag);
             }
           else if (date)
             {
               DEBUG("If-Modified-Since %s", date);
               soup_message_headers_append (msg->request_headers,
-                                           "If-Modified-Since", date);
+                  "If-Modified-Since", date);
             }
 
           g_free (date);
         }
 
+      TileDestroyedCbData *tile_destroyed_cb_data = g_new (TileDestroyedCbData, 1);
+      tile_destroyed_cb_data->map_source = map_source;
+      tile_destroyed_cb_data->msg = msg;
+
+      g_object_add_weak_pointer (G_OBJECT (msg), (gpointer*)&tile_destroyed_cb_data->msg);
+      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer*)&tile_destroyed_cb_data->map_source);
+
+      g_signal_connect_data (tile, "destroy", G_CALLBACK (tile_destroyed_cb),
+          tile_destroyed_cb_data, (GClosureNotify) destroy_cb_data, 0);
+
       callback_data = g_new (TileLoadedCallbackData, 1);
       callback_data->tile = tile;
       callback_data->map_source = map_source;
 
-      /* Ref the tile as it may be freeing during the loading
-       * Unref when the loading is done.
-       */
-      g_object_ref (tile);
+      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
       g_object_ref (map_source);
 
       soup_session_queue_message (priv->soup_session, msg,
-                                  tile_loaded_cb,
-                                  callback_data);
+          tile_loaded_cb,
+          callback_data);
     }
   else
     {

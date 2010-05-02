@@ -25,7 +25,6 @@
 #include "champlain-tile.h"
 
 #include "champlain-enum-types.h"
-#include "champlain-map.h"
 #include "champlain-private.h"
 
 #include <math.h>
@@ -35,7 +34,7 @@
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-G_DEFINE_TYPE (ChamplainTile, champlain_tile, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainTile, champlain_tile, CLUTTER_TYPE_GROUP)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_TILE, ChamplainTilePrivate))
@@ -48,9 +47,9 @@ enum
   PROP_ZOOM_LEVEL,
   PROP_SIZE,
   PROP_STATE,
-  PROP_ACTOR,
   PROP_CONTENT,
-  PROP_ETAG
+  PROP_ETAG,
+  PROP_FADE_IN
 };
 
 struct _ChamplainTilePrivate {
@@ -60,8 +59,8 @@ struct _ChamplainTilePrivate {
   gint zoom_level; /* The tile's zoom level */
 
   ChamplainState state; /* The tile state: loading, validation, done */
-  ClutterActor *actor; /* An actor grouping all content actors */
   ClutterActor *content_actor; /* The actual tile actor */
+  gboolean fade_in;
 
   GTimeVal *modified_time; /* The last modified time of the cache */
   gchar* etag; /* The HTTP ETag sent by the server */
@@ -91,14 +90,14 @@ champlain_tile_get_property (GObject *object,
       case PROP_STATE:
         g_value_set_enum (value, champlain_tile_get_state (self));
         break;
-      case PROP_ACTOR:
-        g_value_set_object (value, champlain_tile_get_actor (self));
-        break;
       case PROP_CONTENT:
         g_value_set_object (value, champlain_tile_get_content (self));
         break;
       case PROP_ETAG:
         g_value_set_string (value, champlain_tile_get_etag (self));
+        break;
+      case PROP_FADE_IN:
+        g_value_set_boolean (value, champlain_tile_get_fade_in (self));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -130,10 +129,13 @@ champlain_tile_set_property (GObject *object,
         champlain_tile_set_state (self, g_value_get_enum (value));
         break;
       case PROP_CONTENT:
-        champlain_tile_set_content (self, g_value_get_object (value), FALSE);
+        champlain_tile_set_content (self, g_value_get_object (value));
         break;
       case PROP_ETAG:
         champlain_tile_set_etag (self, g_value_get_string (value));
+        break;
+      case PROP_FADE_IN:
+        champlain_tile_set_fade_in (self, g_value_get_boolean (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -143,24 +145,8 @@ champlain_tile_set_property (GObject *object,
 static void
 champlain_tile_dispose (GObject *object)
 {
-  ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
-
-  if (priv->actor != NULL)
-    {
-      g_object_unref (G_OBJECT (priv->actor));
-      priv->actor = NULL;
-    }
-
-  if (priv->content_actor != NULL)
-    {
-      g_object_unref (G_OBJECT (priv->content_actor));
-      priv->content_actor = NULL;
-    }
-
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
-
-
 
 static void
 champlain_tile_finalize (GObject *object)
@@ -270,22 +256,6 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           G_PARAM_READWRITE));
 
   /**
-  * ChamplainTile:actor:
-  *
-  * The #ClutterActor where the tile content is rendered.  Should never change
-  * during the tile's life.
-  *
-  * Since: 0.4
-  */
-  g_object_class_install_property (object_class,
-      PROP_ACTOR,
-      g_param_spec_object ("actor",
-          "Actor",
-          "The tile's actor",
-          CLUTTER_TYPE_ACTOR,
-          G_PARAM_READABLE));
-
-  /**
   * ChamplainTile:content:
   *
   * The #ClutterActor with the specific image content.  When changing this
@@ -318,24 +288,37 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           NULL,
           G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:fade-in:
+  *
+  * Specifies whether the tile should fade in when loading
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_FADE_IN,
+      g_param_spec_boolean ("fade-in",
+          "Fade In",
+          "Tile should fade in",
+          FALSE,
+          G_PARAM_READWRITE));
 }
 
 static void
 champlain_tile_init (ChamplainTile *self)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
   self->priv = priv;
 
-  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->state = CHAMPLAIN_STATE_NONE;
   priv->x = 0;
   priv->y = 0;
   priv->zoom_level = 0;
   priv->size = 0;
   priv->modified_time = NULL;
   priv->etag = NULL;
-
-  priv->actor = g_object_ref (clutter_group_new ());
-  g_object_add_weak_pointer (G_OBJECT (priv->actor), (gpointer*)&priv->actor);
+  priv->fade_in = FALSE;
 
   priv->content_actor = NULL;
 }
@@ -434,23 +417,6 @@ champlain_tile_get_state (ChamplainTile *self)
 }
 
 /**
- * champlain_tile_get_actor:
- * @self: the #ChamplainTile
- *
- * Returns: the tile's actor.  This actor should not change during the tile's
- * lifetime. You should not unref this actor, it is owned by the tile.
- *
- * Since: 0.4
- */
-ClutterActor *
-champlain_tile_get_actor (ChamplainTile *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
-
-  return self->priv->actor;
-}
-
-/**
  * champlain_tile_set_x:
  * @self: the #ChamplainTile
  * @x: the position
@@ -530,6 +496,13 @@ champlain_tile_set_size (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "size");
 }
 
+static void
+fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
+{
+  if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
+    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+}
+
 /**
  * champlain_tile_set_state:
  * @self: the #ChamplainTile
@@ -545,8 +518,41 @@ champlain_tile_set_state (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->state = state;
+  ChamplainTilePrivate *priv = self->priv;
 
+  if (state == priv->state)
+    return;
+
+  if (state == CHAMPLAIN_STATE_DONE && priv->content_actor &&
+      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
+    {
+      clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
+
+      ClutterAnimation *animation;
+
+      clutter_actor_set_opacity (priv->content_actor, 0);
+
+      if (priv->fade_in)
+        {
+          animation = clutter_actor_animate (priv->content_actor,
+              CLUTTER_EASE_IN_CUBIC,
+              500,
+              "opacity", 255,
+              NULL);
+        }
+      else
+        {
+          animation = clutter_actor_animate (priv->content_actor,
+              CLUTTER_LINEAR,
+              150,
+              "opacity", 255,
+              NULL);
+        }
+
+      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
+    }
+
+  priv->state = state;
   g_object_notify (G_OBJECT (self), "state");
 }
 
@@ -630,7 +636,11 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
   struct tm *other_time = gmtime (&priv->modified_time->tv_sec);
   char value [100];
 
+#ifdef G_OS_WIN32
+  strftime (value, 100, "%a, %d %b %Y %H:%M:%S %Z", other_time);
+#else
   strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
+#endif
 
   return g_strdup (value);
 }
@@ -673,33 +683,10 @@ champlain_tile_set_etag (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "etag");
 }
 
-typedef struct {
-  ChamplainTile *tile;
-  ClutterActor *old_actor;
-} AnimationContext;
-
-static void
-fade_in_completed (ClutterAnimation *animation,
-    ClutterActor *old_actor)
-{
-  ClutterActor *parent;
-
-  if (old_actor == NULL)
-    return;
-
-  parent = clutter_actor_get_parent (old_actor);
-
-  if (parent != NULL)
-    clutter_container_remove (CLUTTER_CONTAINER (parent), old_actor, NULL);
-
-  g_object_unref (old_actor);
-}
-
 /**
  * champlain_tile_set_content:
  * @self: the #ChamplainTile
  * @actor: the new content
- * @fade_in: if the new content should be faded in
  *
  * Sets the tile's content
  *
@@ -707,48 +694,18 @@ fade_in_completed (ClutterAnimation *animation,
  */
 void
 champlain_tile_set_content (ChamplainTile *self,
-    ClutterActor *actor,
-    gboolean fade_in)
+    ClutterActor *actor)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
-  g_return_if_fail (actor != NULL);
+  g_return_if_fail (CLUTTER_ACTOR (actor));
 
   ChamplainTilePrivate *priv = self->priv;
-  ClutterActor *old_actor = NULL;
 
-  if (priv->content_actor != NULL)
-    {
-      /* it sometimes happen that the priv->content_actor has been destroyed,
-       * this assert will help determine when with no impact on the user */
-      g_assert (CLUTTER_IS_ACTOR (priv->content_actor));
+  if (priv->content_actor &&
+      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
+    clutter_actor_destroy (priv->content_actor);
 
-      if (fade_in == TRUE)
-        old_actor = g_object_ref (priv->content_actor);
-      else if (priv->actor != NULL)
-        clutter_container_remove (CLUTTER_CONTAINER (priv->actor), priv->content_actor, NULL);
-
-      g_object_unref (priv->content_actor);
-    }
-
-  if (priv->actor != NULL)
-    clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
-
-  if (fade_in == TRUE && priv->actor != NULL)
-    {
-      ClutterAnimation *animation;
-
-      clutter_actor_set_opacity (actor, 0);
-
-      animation = clutter_actor_animate (actor,
-          CLUTTER_EASE_IN_CUBIC,
-          500,
-          "opacity", 255,
-          NULL);
-
-      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), old_actor);
-    }
-
-  priv->content_actor = g_object_ref (actor);
+  priv->content_actor = actor;
 
   g_object_notify (G_OBJECT (self), "content");
 }
@@ -770,3 +727,38 @@ champlain_tile_get_content (ChamplainTile *self)
   return self->priv->content_actor;
 }
 
+/**
+ * champlain_tile_get_fade_in:
+ * @self: the #ChamplainTile
+ *
+ * Returns: the return value determines whether the tile should fade in when loading.
+ *
+ * Since: 0.6
+ */
+gboolean
+champlain_tile_get_fade_in (ChamplainTile *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), FALSE);
+
+  return self->priv->fade_in;
+}
+
+/**
+ * champlain_tile_set_fade_in:
+ * @self: the #ChamplainTile
+ * @fade_in: determines whether the tile should fade in when loading
+ *
+ * Sets the flag determining whether the tile should fade in when loading
+ *
+ * Since: 0.6
+ */
+void
+champlain_tile_set_fade_in (ChamplainTile *self,
+    gboolean fade_in)
+{
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+
+  self->priv->fade_in = fade_in;
+
+  g_object_notify (G_OBJECT (self), "fade-in");
+}

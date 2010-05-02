@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2010 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,30 +16,21 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CHAMPLAIN_PRIVATE_H
-#define CHAMPLAIN_PRIVATE_H
+#ifndef CHAMPLAIN_MEMPHIS_H
+#define CHAMPLAIN_MEMPHIS_H
+
+#define __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
 #include <glib.h>
-#include <clutter/clutter.h>
 
-/*
- * WARNING - NEVER put class private declarations here - add accessor methods
- * to the classes instead. Object encapsulation should be sacred.
- */
+#include "champlain/champlain-features.h"
 
-typedef struct
-{
-  gfloat x;
-  gfloat y;
-  gfloat z;
-} ChamplainFloatPoint;
+#include "champlain/champlain-memphis-tile-source.h"
+#include "champlain/champlain-map-data-source.h"
+#include "champlain/champlain-local-map-data-source.h"
+#include "champlain/champlain-network-map-data-source.h"
+#include "champlain/champlain-bounding-box.h"
 
-typedef struct
-{
-  gfloat x;
-  gfloat y;
-  gint width;
-  gint height;
-} ChamplainRectangle;
+#undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
 #endif

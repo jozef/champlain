@@ -491,6 +491,7 @@ _wrap_champlain_point__set_lon(PyGBoxed *self, PyObject *value,
     pyg_boxed_get(self, ChamplainPoint)->lon = val;
     return 0;
 }
+
 %%
 override champlain_selection_layer_get_selected_markers kwargs
 static PyObject *

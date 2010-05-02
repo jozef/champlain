@@ -49,13 +49,13 @@ typedef struct _ChamplainTile        ChamplainTile;
 typedef struct _ChamplainTileClass   ChamplainTileClass;
 
 struct _ChamplainTile {
-  GObject parent;
+  ClutterGroup parent;
 
   ChamplainTilePrivate *priv;
 };
 
 struct _ChamplainTileClass {
-  GObjectClass parent_class;
+  ClutterGroupClass parent_class;
 };
 
 GType champlain_tile_get_type (void);
@@ -71,15 +71,16 @@ gint champlain_tile_get_y (ChamplainTile *self);
 gint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
-ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
 ClutterActor * champlain_tile_get_content (ChamplainTile *self);
 const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
 gchar * champlain_tile_get_modified_time_string (ChamplainTile *self);
 const gchar * champlain_tile_get_etag (ChamplainTile *self);
+gboolean champlain_tile_get_fade_in (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self,
     gint x);
-void champlain_tile_set_y (ChamplainTile *self, gint y);
+void champlain_tile_set_y (ChamplainTile *self,
+    gint y);
 void champlain_tile_set_zoom_level (ChamplainTile *self,
     gint zoom_level);
 void champlain_tile_set_size (ChamplainTile *self,
@@ -87,12 +88,13 @@ void champlain_tile_set_size (ChamplainTile *self,
 void champlain_tile_set_state (ChamplainTile *self,
     ChamplainState state);
 void champlain_tile_set_content (ChamplainTile *self,
-    ClutterActor* actor,
-    gboolean fade_in);
+    ClutterActor* actor);
 void champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag);
 void champlain_tile_set_modified_time (ChamplainTile *self,
     const GTimeVal *time);
+void champlain_tile_set_fade_in (ChamplainTile *self,
+    gboolean fade_in);
 
 G_END_DECLS
 

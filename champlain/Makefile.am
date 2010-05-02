@@ -5,16 +5,27 @@ BUILT_SOURCES = \
 	champlain-enum-types.h \
 	champlain-enum-types.c \
 	stamp-enum-types \
-	champlain-version.h
+	champlain-version.h 
 
 CLEANFILES = $(BUILT_SOURCES)
 
 CHAMPLAIN_MARSHAL = champlain-marshal
 CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list
 
-lib_LTLIBRARIES = libchamplain-0.5.la
+lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
+
+if ENABLE_MEMPHIS
+memphis_headers = \
+        champlain-memphis.h \
+        champlain-memphis-tile-source.h \
+        champlain-map-data-source.h     \
+        champlain-local-map-data-source.h       \
+        champlain-network-map-data-source.h     \
+        champlain-bounding-box.h
+endif
 
 libchamplain_headers = \
+	$(memphis_headers)		\
 	champlain.h 			\
 	champlain-defines.h		\
 	champlain-point.h		\
@@ -23,7 +34,6 @@ libchamplain_headers = \
 	champlain-selection-layer.h 	\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
-	champlain-map.h			\
 	champlain-tile.h		\
 	champlain-map-source.h		\
 	champlain-map-source-chain.h	\
@@ -36,24 +46,28 @@ libchamplain_headers = \
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-memphis-tile-source.h  \
-	champlain-map-data-source.h	\
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h
+	champlain-features.h
 
-libchamplain_0_5_la_SOURCES = \
+if ENABLE_MEMPHIS
+memphis_sources = \
+        champlain-memphis-tile-source.c		\
+        champlain-map-data-source.c		\
+        champlain-local-map-data-source.c	\
+        champlain-network-map-data-source.c	\
+        champlain-bounding-box.c
+endif
+
+libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
 	$(libchamplain_headers)		\
+	$(memphis_sources)		\
 	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
 	champlain-selection-layer.c 	\
 	champlain-base-marker.c 	\
 	champlain-marker.c 		\
-	champlain-map.c  		\
-	champlain-zoom-level.c 		\
 	champlain-tile.c		\
 	champlain-map-source.c		\
 	champlain-map-source-chain.c	\
@@ -65,18 +79,14 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-map-source-factory.c	\
 	champlain-map-source-desc.c	\
 	champlain-point.c		\
-	champlain-polygon.c	\
-	champlain-memphis-tile-source.c  \
-	champlain-map-data-source.c \
-	champlain-local-map-data-source.c \
-	champlain-network-map-data-source.c \
-	champlain-bounding-box.c
+	champlain-polygon.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
 	champlain-private.h
 
 libchamplain_include_HEADERS = \
+	$(memphis_headers)		\
 	champlain.h 			\
 	champlain-view.h 		\
 	champlain-defines.h 		\
@@ -94,28 +104,25 @@ libchamplain_include_HEADERS = \
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
 	champlain-tile.h		\
-	champlain-zoom-level.h		\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-memphis-tile-source.h  \
-	champlain-map-data-source.h \
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h
+	champlain-features.h		
 
-libchamplain_0_5_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
 
-libchamplain_includedir = $(includedir)/libchamplain-0.5/champlain
+libchamplain_includedir = $(includedir)/libchamplain-@CHAMPLAIN_API_VERSION@/champlain
 
-libchamplain_0_5_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+	-no-undefined 			\
 	-export-symbols-regex		\
 	^champlain_.*
 
 AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
 	$(SOUP_CFLAGS)			\
+	$(MEMPHIS_CFLAGS)		\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\
@@ -169,12 +176,18 @@ champlain-enum-types.c: $(libchamplain_headers) Makefile
 	&& cp xgen-gtc $(@F) \
 	&& rm -f xgen-gtc
 
+
 if HAVE_INTROSPECTION
+
+if ENABLE_MEMPHIS
+memphis_gir_include = --include=Memphis-0.2
+endif
+
 BUILT_GIRSOURCES =
 
-Champlain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-0.5.la
+Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CHAMPLAIN_API_VERSION@.la
 	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace Champlain --nsversion=0.5 \
+	--namespace Champlain --nsversion=@CHAMPLAIN_API_VERSION@ \
 	--strip-prefix=Champlain \
 	$(DEPS_CFLAGS) \
 	$(SOUP_CFLAGS) \
@@ -185,15 +198,16 @@ Champlain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-0.5.la
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
-	--library=champlain-0.5 \
+	$(memphis_gir_include) \
+	--library=champlain-@CHAMPLAIN_API_VERSION@ \
 	--libtool="$(LIBTOOL)" \
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
-	$(addprefix $(srcdir)/,$(libchamplain_0_5_la_SOURCES)) \
+	$(addprefix $(srcdir)/,$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES)) \
 	$(addprefix $(srcdir)/,$(libchamplain_include_HEADERS))
 
-BUILT_GIRSOURCES += Champlain-0.5.gir
+BUILT_GIRSOURCES += Champlain-@CHAMPLAIN_API_VERSION@.gir
 
 # INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
 # install anything - we need to install inside our prefix.

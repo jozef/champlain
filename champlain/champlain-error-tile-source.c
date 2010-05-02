@@ -32,14 +32,13 @@ G_DEFINE_TYPE (ChamplainErrorTileSource, champlain_error_tile_source, CHAMPLAIN_
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_ERROR_TILE_SOURCE, ChamplainErrorTileSourcePrivate))
 
-typedef struct _ChamplainErrorTileSourcePrivate ChamplainErrorTileSourcePrivate;
-
 struct _ChamplainErrorTileSourcePrivate
 {
   ClutterActor *error_actor;
 };
 
-static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
+static void fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile);
 
 static void
 champlain_error_tile_source_dispose (GObject *object)
@@ -71,6 +70,9 @@ static void
 champlain_error_tile_source_init (ChamplainErrorTileSource *error_source)
 {
   ChamplainErrorTileSourcePrivate *priv = GET_PRIVATE(error_source);
+
+  error_source->priv = priv;
+
   priv->error_actor = NULL;
 }
 
@@ -90,18 +92,23 @@ ChamplainErrorTileSource* champlain_error_tile_source_new_full (guint tile_size)
 }
 
 static void
-fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
+fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_ERROR_TILE_SOURCE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
-  ChamplainErrorTileSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainErrorTileSourcePrivate *priv = CHAMPLAIN_ERROR_TILE_SOURCE (map_source)->priv;
   ClutterActor *clone;
   guint size;
 
   if (champlain_tile_get_content (tile))
-    /* cache is just validating tile - don't generate error tile in this case */
+  {
+    /* cache is just validating tile - don't generate error tile in this case - instead use what we have */
+    if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
     return;
+  }
 
   size = champlain_map_source_get_tile_size (map_source);
 
@@ -143,7 +150,6 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 
   clone = clutter_clone_new (priv->error_actor);
 
-  champlain_tile_set_content (tile, clone, TRUE);
-  champlain_tile_set_size (tile, size);
+  champlain_tile_set_content (tile, clone);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 }

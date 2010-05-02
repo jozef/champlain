@@ -28,15 +28,28 @@
 #include "champlain-polygon.h"
 
 #include "champlain-defines.h"
-#include "champlain-private.h"
+#include "champlain-map-source.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
+#include <math.h>
 
 static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
 static ClutterColor DEFAULT_STROKE_COLOR = {0xa4, 0x00, 0x00, 0xff};
 
-G_DEFINE_TYPE (ChamplainPolygon, champlain_polygon, G_TYPE_INITIALLY_UNOWNED)
+struct _ChamplainPolygonPrivate {
+  GList *points;
+  gboolean closed_path;
+  ClutterColor *stroke_color;
+  gboolean fill;
+  ClutterColor *fill_color;
+  gboolean stroke;
+  gdouble stroke_width;
+  gboolean visible;
+  gboolean mark_points;
+};
+
+G_DEFINE_TYPE (ChamplainPolygon, champlain_polygon, CLUTTER_TYPE_GROUP)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_POLYGON, ChamplainPolygonPrivate))
@@ -127,7 +140,7 @@ champlain_polygon_set_property (GObject *object,
             g_value_get_double (value));
         break;
       case PROP_VISIBLE:
-        if (g_value_get_boolean (value) == TRUE)
+        if (g_value_get_boolean (value))
             champlain_polygon_show (CHAMPLAIN_POLYGON (object));
         else
             champlain_polygon_hide (CHAMPLAIN_POLYGON (object));
@@ -144,22 +157,14 @@ champlain_polygon_set_property (GObject *object,
 static void
 champlain_polygon_dispose (GObject *object)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
-
-  if (priv->actor != NULL)
-    {
-      g_object_unref (priv->actor);
-      priv->actor = NULL;
-    }
-
-  champlain_polygon_clear_points (CHAMPLAIN_POLYGON (object));
-
   G_OBJECT_CLASS (champlain_polygon_parent_class)->dispose (object);
 }
 
 static void
 champlain_polygon_finalize (GObject *object)
 {
+  champlain_polygon_clear_points (CHAMPLAIN_POLYGON (object));
+
   G_OBJECT_CLASS (champlain_polygon_parent_class)->finalize (object);
 }
 
@@ -297,17 +302,19 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
 static void
 champlain_polygon_init (ChamplainPolygon *polygon)
 {
-  polygon->priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
 
-  polygon->priv->visible = TRUE;
-  polygon->priv->points = NULL;
-  polygon->priv->fill = FALSE;
-  polygon->priv->stroke = TRUE;
-  polygon->priv->stroke_width = 2.0;
-  polygon->priv->mark_points = FALSE;
+  polygon->priv = priv;
 
-  polygon->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
-  polygon->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
+  priv->visible = TRUE;
+  priv->points = NULL;
+  priv->fill = FALSE;
+  priv->stroke = TRUE;
+  priv->stroke_width = 2.0;
+  priv->mark_points = FALSE;
+
+  priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
+  priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 }
 
 /**
@@ -342,9 +349,11 @@ champlain_polygon_append_point (ChamplainPolygon *polygon,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
+  ChamplainPolygonPrivate *priv = polygon->priv;
+
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
-  polygon->priv->points = g_list_append (polygon->priv->points, point);
+  priv->points = g_list_append (priv->points, point);
   g_object_notify (G_OBJECT (polygon), "visible");
   return point;
 }
@@ -370,9 +379,11 @@ champlain_polygon_insert_point (ChamplainPolygon *polygon,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
+  ChamplainPolygonPrivate *priv = polygon->priv;
+
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
-  polygon->priv->points = g_list_insert (polygon->priv->points, point, pos);
+  priv->points = g_list_insert (priv->points, point, pos);
   g_object_notify (G_OBJECT (polygon), "visible");
   return point;
 }
@@ -392,7 +403,9 @@ champlain_polygon_remove_point (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  polygon->priv->points = g_list_remove (polygon->priv->points, point);
+  ChamplainPolygonPrivate *priv = polygon->priv;
+
+  priv->points = g_list_remove (priv->points, point);
   g_object_notify (G_OBJECT (polygon), "visible");
 }
 
@@ -409,14 +422,16 @@ champlain_polygon_clear_points (ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  GList *next = polygon->priv->points;
+  ChamplainPolygonPrivate *priv = polygon->priv;
+
+  GList *next = priv->points;
   while (next != NULL)
   {
     champlain_point_free (next->data);
     next = g_list_next (next);
   }
-  g_list_free (polygon->priv->points);
-  polygon->priv->points = NULL;
+  g_list_free (priv->points);
+  priv->points = NULL;
   g_object_notify (G_OBJECT (polygon), "visible");
 }
 
@@ -458,7 +473,7 @@ champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
     clutter_color_free (priv->fill_color);
 
   if (color == NULL)
-     color = &DEFAULT_FILL_COLOR;
+    color = &DEFAULT_FILL_COLOR;
 
   priv->fill_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (polygon), "fill-color");
@@ -486,7 +501,7 @@ champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
     clutter_color_free (priv->stroke_color);
 
   if (color == NULL)
-     color = &DEFAULT_STROKE_COLOR;
+    color = &DEFAULT_STROKE_COLOR;
 
   priv->stroke_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (polygon), "stroke-color");
@@ -679,8 +694,7 @@ champlain_polygon_show (ChamplainPolygon *polygon)
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   polygon->priv->visible = TRUE;
-  if (polygon->priv->actor != NULL)
-    clutter_actor_show (polygon->priv->actor);
+  clutter_actor_show (CLUTTER_ACTOR (polygon));
   g_object_notify (G_OBJECT (polygon), "visible");
 }
 
@@ -698,7 +712,99 @@ champlain_polygon_hide (ChamplainPolygon *polygon)
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   polygon->priv->visible = FALSE;
-  if (polygon->priv->actor != NULL)
-    clutter_actor_hide (polygon->priv->actor);
+  clutter_actor_hide (CLUTTER_ACTOR (polygon));
   g_object_notify (G_OBJECT (polygon), "visible");
+}
+
+void
+champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
+    ChamplainMapSource *map_source,
+    guint zoom_level,
+    gfloat width,
+    gfloat height,
+    gfloat shift_x,
+    gfloat shift_y)
+{
+  ChamplainPolygonPrivate *priv = polygon->priv;
+  ClutterActor *cairo_texture;
+  cairo_t *cr;
+
+  if (!priv->visible)
+    return;
+
+  clutter_group_remove_all (CLUTTER_GROUP (polygon));
+  cairo_texture = clutter_cairo_texture_new (width, height);
+  clutter_container_add_actor (CLUTTER_CONTAINER (polygon), cairo_texture);
+
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, width, height);
+  cairo_fill (cr);
+
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+  GList *list = g_list_first (priv->points);
+  while (list != NULL)
+    {
+      ChamplainPoint *point = (ChamplainPoint*) list->data;
+      gfloat x, y;
+
+      x = champlain_map_source_get_x (map_source, zoom_level, point->lon);
+      y = champlain_map_source_get_y (map_source, zoom_level, point->lat);
+
+      x -= shift_x;
+      y -= shift_y;
+
+      cairo_line_to (cr, x, y);
+
+      list = list->next;
+    }
+
+  if (priv->closed_path)
+    cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr,
+      priv->fill_color->red / 255.0,
+      priv->fill_color->green / 255.0,
+      priv->fill_color->blue / 255.0,
+      priv->fill_color->alpha / 255.0);
+
+  if (priv->fill)
+    cairo_fill_preserve (cr);
+
+  cairo_set_source_rgba (cr,
+      priv->stroke_color->red / 255.0,
+      priv->stroke_color->green / 255.0,
+      priv->stroke_color->blue / 255.0,
+      priv->stroke_color->alpha / 255.0);
+
+  cairo_set_line_width (cr, priv->stroke_width);
+
+  if (priv->stroke)
+    cairo_stroke (cr);
+
+  if (priv->mark_points)
+    {
+      /* Draw points */
+      GList *list = g_list_first (priv->points);
+      while (list != NULL)
+        {
+          ChamplainPoint *point = (ChamplainPoint*) list->data;
+          gfloat x, y;
+
+          x = champlain_map_source_get_x (map_source, zoom_level, point->lon);
+          y = champlain_map_source_get_y (map_source, zoom_level, point->lat);
+
+          x -= shift_x;
+          y -= shift_y;
+
+          cairo_arc (cr, x, y, priv->stroke_width * 1.5, 0, 2 * M_PI);
+          cairo_fill (cr);
+
+          list = list->next;
+        }
+    }
+
+  cairo_destroy (cr);
 }

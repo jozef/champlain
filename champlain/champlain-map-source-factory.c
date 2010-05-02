@@ -39,13 +39,15 @@
 #include "champlain-debug.h"
 
 #include "champlain.h"
+#ifdef CHAMPLAIN_HAS_MEMPHIS
+#include "champlain-memphis.h"
+#endif
 #include "champlain-file-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-zoom-level.h"
 #include "champlain-network-tile-source.h"
 #include "champlain-map-source-chain.h"
 #include "champlain-error-tile-source.h"
@@ -77,10 +79,12 @@ struct _ChamplainMapSourceFactoryPrivate
 };
 
 static ChamplainMapSource * champlain_map_source_new_generic (
-     ChamplainMapSourceDesc *desc, gpointer data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 
+#ifdef CHAMPLAIN_HAS_MEMPHIS
 static ChamplainMapSource * champlain_map_source_new_memphis (
     ChamplainMapSourceDesc *desc, gpointer user_data);
+#endif
 
 static void
 champlain_map_source_factory_get_property (GObject *object,
@@ -253,6 +257,7 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     NULL
   };
 
+#ifdef CHAMPLAIN_HAS_MEMPHIS
 static
 ChamplainMapSourceDesc MEMPHIS_LOCAL_DESC =
   {
@@ -282,6 +287,7 @@ ChamplainMapSourceDesc MEMPHIS_NETWORK_DESC =
     "",
     NULL
   };
+#endif
 
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
@@ -306,10 +312,12 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 #endif
   champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
       MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
+#ifdef CHAMPLAIN_HAS_MEMPHIS
   champlain_map_source_factory_register (factory, &MEMPHIS_LOCAL_DESC,
       MEMPHIS_LOCAL_DESC.constructor, MEMPHIS_LOCAL_DESC.data);
   champlain_map_source_factory_register (factory, &MEMPHIS_NETWORK_DESC,
       MEMPHIS_NETWORK_DESC.constructor, MEMPHIS_NETWORK_DESC.data);
+#endif
 }
 
 /**
@@ -427,7 +435,8 @@ ChamplainMapSource * champlain_map_source_factory_create_cached_source (Champlai
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
+    ChamplainMapSourceDesc *desc,
+    ChamplainMapSourceConstructor constructor,
     gpointer data)
 {
 
@@ -440,7 +449,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 
 static ChamplainMapSource *
 champlain_map_source_new_generic (
-     ChamplainMapSourceDesc *desc, gpointer user_data)
+    ChamplainMapSourceDesc *desc, gpointer user_data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,
@@ -454,6 +463,7 @@ champlain_map_source_new_generic (
       desc->uri_format));
 }
 
+#ifdef CHAMPLAIN_HAS_MEMPHIS
 static ChamplainMapSource *
 champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
     gpointer user_data)
@@ -486,3 +496,5 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
       desc->projection,
       map_data_source));
 }
+#endif
+
