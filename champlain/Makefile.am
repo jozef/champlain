@@ -110,7 +110,7 @@ libchamplain_include_HEADERS = \
 	champlain-version.h		\
 	champlain-features.h		
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
 
 libchamplain_includedir = $(includedir)/libchamplain-@CHAMPLAIN_API_VERSION@/champlain
 
@@ -122,6 +122,7 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = -version-info $(LIBRARY_VERSIO
 AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
 	$(SOUP_CFLAGS)			\
+	$(SOUP_GNOME_CFLAGS)		\
 	$(MEMPHIS_CFLAGS)		\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)/tidy		\
@@ -191,6 +192,7 @@ Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CH
 	--strip-prefix=Champlain \
 	$(DEPS_CFLAGS) \
 	$(SOUP_CFLAGS) \
+	$(SOUP_GNOME_CFLAGS)		\
 	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\

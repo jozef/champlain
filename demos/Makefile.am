@@ -6,17 +6,17 @@ AM_CPPFLAGS = $(DEPS_CFLAGS) $(WARN_CFLAGS)
 AM_LDFLAGS = $(DEPS_LIBS)
 
 launcher_SOURCES = launcher.c markers.c
-launcher_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+launcher_LDADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 animated_marker_SOURCES = animated-marker.c
-animated_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+animated_marker_LDADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 polygons_SOURCES = polygons.c
-polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+polygons_LDADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 url_marker_SOURCES = url-marker.c
-url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS)
-url_marker_LDADD = $(SOUP_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS) $(SOUP_GNOME_CFLAGS)
+url_marker_LDADD = $(SOUP_LIBS) $(SOUP_GNOME_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 if ENABLE_GTK
 noinst_PROGRAMS += launcher-gtk

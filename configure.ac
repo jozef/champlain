@@ -72,11 +72,9 @@ PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.26, [
     ], have_soup_gnome="no")
 
 
-if test "x$have_soup_gnome" = "xno"; then
-  PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.4.1,
-     have_soup="yes", have_soup="no")
-  SOUP_DEP="libsoup-2.4"
-fi
+PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.4.1,
+    have_soup="yes", have_soup="no")
+SOUP_DEP="libsoup-2.4"
 
 if test "x$have_soup" = "xno" && test "x$have_soup_gnome" = "xno"; then
    AC_MSG_ERROR([Could not find libsoup or libsoup-gnome.])
