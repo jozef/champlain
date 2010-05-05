@@ -20,3 +20,4 @@ CHAMPLAIN_TYPE_ERROR_TILE_SOURCE          ChamplainErrorTileSource          GObj
 CHAMPLAIN_TYPE_FILE_CACHE                 ChamplainFileCache                GObject    Champlain::FileCache
 CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN           ChamplainMapSourceChain           GObject    Champlain::MapSourceChain
 CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE        ChamplainNetworkTileSource        GObject    Champlain::NetworkTileSource
+CHAMPLAIN_TYPE_TILE_CACHE                 ChamplainTileCache                GObject    Champlain::TileCache
