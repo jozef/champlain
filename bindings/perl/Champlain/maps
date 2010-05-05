@@ -4,9 +4,7 @@ CHAMPLAIN_TYPE_LAYER                      ChamplainLayer                    GObj
 CHAMPLAIN_TYPE_BASE_MARKER                ChamplainBaseMarker               GObject    Champlain::BaseMarker
 CHAMPLAIN_TYPE_MARKER                     ChamplainMarker                   GObject    Champlain::Marker
 CHAMPLAIN_TYPE_MAP_SOURCE                 ChamplainMapSource                GObject    Champlain::MapSource
-CHAMPLAIN_TYPE_ZOOM_LEVEL                 ChamplainZoomLevel                GObject    Champlain::ZoomLevel
 CHAMPLAIN_TYPE_TILE                       ChamplainTile                     GObject    Champlain::Tile
-CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE         ChamplainNetworkMapSource         GObject    Champlain::NetworkMapSource
 CHAMPLAIN_TYPE_MAP_PROJECTION             ChamplainMapProjection            GEnum      Champlain::MapProjection
 CHAMPLAIN_TYPE_STATE                      ChamplainState                    GEnum      Champlain::State
 CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY         ChamplainMapSourceFactory         GObject    Champlain::MapSourceFactory
