@@ -9,7 +9,14 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
 
 
 void
-champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache, ChamplainTile *tile, const gchar *contents, gsize size)
+champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache, ChamplainTile *tile, SV *sv_contents)
+	PREINIT:
+		STRLEN length;
+		char *contents;
+
+	CODE:
+		contents = SvPV(sv_contents, length);
+		champlain_tile_cache_store_tile (tile_cache, tile, contents, length);
 
 
 void
