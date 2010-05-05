@@ -85,7 +85,7 @@ sub test_all_setters {
 	is($tile->get_content(), $actor, "set_content()");
 	
 	$tile->set_etag('http://localhost/tile/2/100-250.png');
-	is($tile->get_etag(), 'http://localhost/tile/2/100-250.png', "set_uri()");
+	is($tile->get_etag(), 'http://localhost/tile/2/100-250.png', "set_etag()");
 
 	# Set the time to now
 	$tile->set_modified_time();
