@@ -186,3 +186,7 @@ MFF_RELIEF (class)
 
 	OUTPUT:
 		RETVAL
+
+
+ChamplainMapSource*
+champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory, const gchar *id)

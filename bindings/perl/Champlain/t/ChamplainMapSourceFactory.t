@@ -73,6 +73,9 @@ sub test_map_factory {
 	# Get the maps available
 	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
+
+	my $source = $factory->create_cached_source('cached');
+	isa_ok($source, 'Champlain::MapSource');
 }
 
 
@@ -112,7 +115,7 @@ sub test_map_register {
 		is($desc->uri_format, $description->{uri_format}, "MapSourceDesc has the right uri_format");
 		isa_ok($data, 'Champlain::MapSourceFactory');
 
-		return Champlain::NetworkMapSource->new_full(
+		return Champlain::NetworkTileSource->new_full(
 			$desc->id,
 			$desc->name,
 			$desc->license,
@@ -139,7 +142,6 @@ sub test_map_register {
 	is($map->get_max_zoom_level, $description->{max_zoom_level}, "Created map has the right max_zoom_level");
 	is($map->get_projection, $description->{projection}, "Created map has the right projection");
 	is($map->get_tile_size, 256, "Created map has the right tile_size");
-	is($map->get_tile_uri(1, 2, 3), 'http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/3/1/2.jpg', "Created map has the right tile_uri");
 }
 
 
