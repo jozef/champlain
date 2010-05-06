@@ -253,14 +253,10 @@ sub generic_map_operations {
 
 	my $tile = Champlain::Tile->new();
 	is($tile->get_size(), 0, "get_size() default tile");
-	is($tile->get_state(), 'init', "get_state() default tile");
-	is($tile->get_uri(), undef, "get_uri() default tile");
-	is($tile->get_filename(), undef, "get_filename() default tile");
+	is($tile->get_state(), 'none', "get_state() default tile");
 	$map->fill_tile($tile);
-	is($tile->get_size(), $map->get_tile_size, "size is filled");
-	is($tile->get_state(), 'loading', "state changed");
-	ok($tile->get_uri(), "uri is filled");
-	ok($tile->get_filename(),  "filename is filled");
+	is($tile->get_size(), 0, "size is filled");
+	is($tile->get_state(), 'none', "state changed");
 }
 
 
