@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 177;
+use Clutter::TestHelper tests => 169;
 
 use Champlain qw(:coords :maps);
 
@@ -257,6 +257,12 @@ sub generic_map_operations {
 	$map->fill_tile($tile);
 	is($tile->get_size(), 0, "size is filled");
 	is($tile->get_state(), 'none', "state changed");
+
+
+	is($map->get_next_source, undef, "get_next_source");
+	my $next_source = Champlain::FileCache->new();
+	$map->set_next_source($next_source);
+	is($map->get_next_source, $next_source, "set_next_source");
 }
 
 

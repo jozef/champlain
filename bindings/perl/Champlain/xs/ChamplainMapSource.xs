@@ -86,3 +86,11 @@ champlain_map_source_fill_tile (ChamplainMapSource *map_source, ChamplainTile *t
 
 gfloat
 champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source, gint zoom_level, gdouble latitude, gdouble longitude)
+
+
+ChamplainMapSource*
+champlain_map_source_get_next_source (ChamplainMapSource *map_source)
+
+
+void
+champlain_map_source_set_next_source (ChamplainMapSource *map_source, ChamplainMapSource *next_source)
