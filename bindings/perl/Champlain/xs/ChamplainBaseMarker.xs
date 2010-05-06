@@ -35,3 +35,11 @@ champlain_base_marker_animate_out (ChamplainBaseMarker *marker)
 
 void
 champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker, guint delay)
+
+
+gdouble
+champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
+
+
+gdouble
+champlain_base_marker_get_longitude (ChamplainBaseMarker *marker)

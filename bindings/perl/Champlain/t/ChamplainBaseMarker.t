@@ -20,9 +20,8 @@ sub tests {
 	is($longitude, 0.0, "Initial longitude is at 0.0");
 
 	$marker->set_position(20.0, 40.0);
-	($latitude, $longitude) = $marker->get('latitude', 'longitude');
-	is($latitude, 20.0, "set_position() changed the latitude");
-	is($longitude, 40.0, "set_position() changed the longitude");
+	is($marker->get_latitude, 20.0, "set_position() changed the latitude");
+	is($marker->get_longitude, 40.0, "set_position() changed the longitude");
 
 	is($marker->get_highlighted(), FALSE, "Initial highlighted is false");
 	$marker->set_highlighted(TRUE);
