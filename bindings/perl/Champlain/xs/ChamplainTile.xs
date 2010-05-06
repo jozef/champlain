@@ -149,3 +149,11 @@ champlain_tile_set_modified_time (ChamplainTile *self, ...)
 		}
 
 		champlain_tile_set_modified_time(self, &modified_time);
+
+
+void
+champlain_tile_set_fade_in (ChamplainTile *self, gboolean fade_in)
+
+
+gboolean
+champlain_tile_get_fade_in (ChamplainTile *self)

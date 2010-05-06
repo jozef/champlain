@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 44;
+use Clutter::TestHelper tests => 48;
 
 use Champlain ':coords';
 use Data::Dumper;
@@ -109,4 +109,10 @@ sub test_all_setters {
 		[1247335783, 20],
 		"set_modified_time(0, 0)"
 	);
+
+	$tile->set_fade_in(FALSE);
+	is($tile->get_fade_in, FALSE, "get_fade_in");
+
+	$tile->set_fade_in(TRUE);
+	is($tile->get_fade_in, TRUE, "set_fade_in");
 }
