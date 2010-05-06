@@ -46,11 +46,7 @@ sub test_generic {
 	# Can't be tested but at least we check that it doesn't crash when invoked
 	my $layer = Champlain::Layer->new();
 	$view->add_layer($layer);
-
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 0;
-		$view->remove_layer($layer);
-	}
+	$view->remove_layer($layer);
 	
 	# Change the map source (get a different map source)
 	my $factory = Champlain::MapSourceFactory->dup_default();
@@ -106,39 +102,36 @@ sub test_generic {
 	ok(!$view->get_keep_center_on_resize, "get_keep_center_on_resize()");
 	
 	
-	# Call ensure_visible(), it's to test, but at least we test that it doesn't crash
+	# Call ensure_visible(), it's hard to test, but at least we check that it doesn't crash
 	$view->ensure_visible(10, 10, 30, 30, TRUE);
 
 
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
-		$view->set_license_text("Perl Universal License");
-		is($view->get_license_text, "Perl Universal License", "set_license_text(text)");
+	$view->set_license_text("Perl Universal License");
+	is($view->get_license_text, "Perl Universal License", "set_license_text(text)");
 
-		$view->set_license_text(undef);
-		is($view->get_license_text, undef, "set_license_text(undef)");
+	$view->set_license_text(undef);
+	is($view->get_license_text, undef, "set_license_text(undef)");
 
 
-		$view->set_max_scale_width(200);
-		is($view->get_max_scale_width, 200, "set_max_scale_width(200)");
+	$view->set_max_scale_width(200);
+	is($view->get_max_scale_width, 200, "set_max_scale_width(200)");
 
-		$view->set_max_scale_width(400);
-		is($view->get_max_scale_width, 400, "set_max_scale_width(400)");
-
-
-		$view->set_scale_unit('miles');
-		is($view->get_scale_unit, 'miles', "set_max_scale_width('miles')");
-
-		$view->set_scale_unit('km');
-		is($view->get_scale_unit, 'km', "set_max_scale_width('km')");
+	$view->set_max_scale_width(400);
+	is($view->get_max_scale_width, 400, "set_max_scale_width(400)");
 
 
-		$view->set_show_scale(TRUE);
-		is($view->get_show_scale, TRUE, "set_show_scale(TRUE)");
+	$view->set_scale_unit('miles');
+	is($view->get_scale_unit, 'miles', "set_max_scale_width('miles')");
 
-		$view->set_show_scale(FALSE);
-		is($view->get_show_scale, FALSE, "set_show_scale(FALSE)");
-	}
+	$view->set_scale_unit('km');
+	is($view->get_scale_unit, 'km', "set_max_scale_width('km')");
+
+
+	$view->set_show_scale(TRUE);
+	is($view->get_show_scale, TRUE, "set_show_scale(TRUE)");
+
+	$view->set_show_scale(FALSE);
+	is($view->get_show_scale, FALSE, "set_show_scale(FALSE)");
 }
 
 

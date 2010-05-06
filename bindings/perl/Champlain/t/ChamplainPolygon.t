@@ -44,14 +44,11 @@ sub test_empty {
 	ok(!$polygon->get('closed-path'), "closed-path is unset on a new polygon");
 	ok($polygon->get('visible'), "closed-path is set on a new polygon");
 
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
-		$polygon->set_mark_points(TRUE);
-		is($polygon->get_mark_points, TRUE, "set_mark_points(TRUE)");
+	$polygon->set_mark_points(TRUE);
+	is($polygon->get_mark_points, TRUE, "set_mark_points(TRUE)");
 
-		$polygon->set_mark_points(FALSE);
-		is($polygon->get_mark_points, FALSE, "set_mark_points(FALSE)");
-	}
+	$polygon->set_mark_points(FALSE);
+	is($polygon->get_mark_points, FALSE, "set_mark_points(FALSE)");
 }
 
 

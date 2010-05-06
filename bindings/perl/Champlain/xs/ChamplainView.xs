@@ -148,15 +148,9 @@ void
 champlain_view_remove_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 
 
-#if CHAMPLAIN_CHECK_VERSION (0, 4, 1)
-
 void
 champlain_view_remove_layer (ChamplainView *view, ChamplainLayer *layer)
 
-#endif /* 0.4.1 */
-
-
-#if CHAMPLAIN_CHECK_VERSION (0, 4, 3)
 
 const gchar_ornull *
 champlain_view_get_license_text (ChamplainView *view)
@@ -188,5 +182,3 @@ champlain_view_set_scale_unit (ChamplainView *view, ChamplainUnit unit)
 
 void
 champlain_view_set_show_scale (ChamplainView *view, gboolean value)
-
-#endif /* 0.4.3 */

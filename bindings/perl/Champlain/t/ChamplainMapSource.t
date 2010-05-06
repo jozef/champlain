@@ -242,16 +242,13 @@ sub generic_map_operations {
 
 
 	# Check that min zoom level and max zoom level meters per pixel at different
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
-		my $meters_at_min = $map->get_meters_per_pixel($map->get_min_zoom_level, 0, 0);
-		ok($meters_at_min > 0, "Meters per pixel $meters_at_min at min zoom level");
+	my $meters_at_min = $map->get_meters_per_pixel($map->get_min_zoom_level, 0, 0);
+	ok($meters_at_min > 0, "Meters per pixel $meters_at_min at min zoom level");
 
-		my $meters_at_max = $map->get_meters_per_pixel($map->get_max_zoom_level, 0, 0);
-		ok($meters_at_max > 0, "Meters per pixel $meters_at_max at max zoom level");
+	my $meters_at_max = $map->get_meters_per_pixel($map->get_max_zoom_level, 0, 0);
+	ok($meters_at_max > 0, "Meters per pixel $meters_at_max at max zoom level");
 
-		ok($meters_at_max < $meters_at_min, "Meters per pixel are different at max/min zoom level");
-	}
+	ok($meters_at_max < $meters_at_min, "Meters per pixel are different at max/min zoom level");
 
 
 	my $tile = Champlain::Tile->new();

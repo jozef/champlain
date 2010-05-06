@@ -84,9 +84,5 @@ void
 champlain_map_source_fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 
 
-#if CHAMPLAIN_CHECK_VERSION (0, 4, 3)
-
 gfloat
 champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source, gint zoom_level, gdouble latitude, gdouble longitude)
-
-#endif /* 0.4.3 */

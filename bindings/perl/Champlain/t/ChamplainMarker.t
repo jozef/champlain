@@ -36,25 +36,19 @@ sub tests {
 sub test_global_colors {
 
 	Champlain::Marker->set_highlight_color(Clutter::Color->new(0xff, 0xff, 0x00));
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 1;
-		is_color(
-			Champlain::Marker->get_highlight_color,
-			Clutter::Color->new(0xff, 0xff, 0x00),
-			"get_highlight_color()"
-		);
-	}
+	is_color(
+		Champlain::Marker->get_highlight_color,
+		Clutter::Color->new(0xff, 0xff, 0x00),
+		"get_highlight_color()"
+	);
 
 
 	Champlain::Marker->set_highlight_text_color(Clutter::Color->new(0xff, 0xef, 0x00));
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 1;
-		is_color(
-			Champlain::Marker->get_highlight_text_color,
-			Clutter::Color->new(0xff, 0xef, 0x00),
-			"get_highlight_color()"
-		);
-	}
+	is_color(
+		Champlain::Marker->get_highlight_text_color,
+		Clutter::Color->new(0xff, 0xef, 0x00),
+		"get_highlight_color()"
+	);
 }
 
 
@@ -215,10 +209,7 @@ sub generic_test {
 
 
 	# Can't be tested but at least we call it
-	SKIP: {
-		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 0;
-		$marker->queue_redraw();
-	}
+	$marker->queue_redraw();
 }
 
 
