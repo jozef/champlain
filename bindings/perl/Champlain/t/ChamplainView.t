@@ -441,7 +441,7 @@ sub run_animation_loop {
 		$stage->add($view);
 		$stage->set_size(400, 400);
 		$view->set_size($stage->get_size);
-		#$stage->show_all();
+		$stage->show_all() if @ARGV;
 	}
 
 
