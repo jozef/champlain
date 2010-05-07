@@ -980,8 +980,7 @@ champlain_marker_set_image (ChamplainMarker *marker,
 
   if (priv->image != NULL)
     {
-      g_object_unref (image);
-      clutter_actor_destroy (priv->image);
+      g_object_unref (priv->image);
     }
 
   if (image != NULL)
