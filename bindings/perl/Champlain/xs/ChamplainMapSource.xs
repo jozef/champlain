@@ -44,36 +44,16 @@ guint
 champlain_map_source_get_column_count (ChamplainMapSource *map_source, gint zoom_level)
 
 
-void
-champlain_map_source_set_name (ChamplainMapSource *map_source, const gchar *name)
-
-
-void
-champlain_map_source_set_license (ChamplainMapSource *map_source, const gchar *license)
-
-
 const gchar*
 champlain_map_source_get_license (ChamplainMapSource *map_source)
-
-
-void
-champlain_map_source_set_projection (ChamplainMapSource *map_source, ChamplainMapProjection projection)
 
 
 ChamplainMapProjection
 champlain_map_source_get_projection (ChamplainMapSource *map_source)
 
 
-void
-champlain_map_source_set_id (ChamplainMapSource *map_source, const gchar *id)
-
-
 const gchar*
 champlain_map_source_get_id (ChamplainMapSource *map_source)
-
-
-void
-champlain_map_source_set_license_uri (ChamplainMapSource *map_source, const gchar *license_uri)
 
 
 const gchar*

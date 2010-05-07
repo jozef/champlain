@@ -54,14 +54,6 @@ void
 champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
 
 
-void
-champlain_tile_set_uri (ChamplainTile *self, const gchar* uri)
-
-
-void
-champlain_tile_set_filename (ChamplainTile *self, const gchar* filename)
-
-
 ClutterActor *
 champlain_tile_get_content (ChamplainTile *self)
 

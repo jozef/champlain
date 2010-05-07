@@ -14,10 +14,6 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
 
 
 void
-champlain_view_set_size (ChamplainView *view, guint width, guint height)
-
-
-void
 champlain_view_zoom_in (ChamplainView *view)
 
 
