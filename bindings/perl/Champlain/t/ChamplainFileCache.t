@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
+use File::Temp 'tempdir';
 use Clutter::TestHelper tests => 5;
-
 use Champlain;
 
 exit tests();
@@ -13,7 +13,8 @@ sub tests {
 	my $cache = Champlain::FileCache->new();
 	isa_ok($cache, 'Champlain::FileCache');
 	
-	$cache = Champlain::FileCache->new_full(1_024 * 10, "cache", FALSE);
+	my $folder = tempdir(CLEANUP => 1);
+	$cache = Champlain::FileCache->new_full(1_024 * 10, $folder, FALSE);
 	isa_ok($cache, 'Champlain::FileCache');
 
 
@@ -21,7 +22,7 @@ sub tests {
 	$cache->set_size_limit(2_048);
 	is($cache->get_size_limit, 2_048, "set_size_limit");
 	
-	is($cache->get_cache_dir, "cache", "get_cache_dir");
+	is($cache->get_cache_dir, $folder, "get_cache_dir");
 	
 	# Can't be tested
 	$cache->purge();
