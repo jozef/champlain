@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Clutter::TestHelper tests => 22;
-use Test::Exception;
-
 use Champlain ':maps';
 
+
 exit tests();
+
 
 sub tests {
 	test_get_set();
@@ -69,9 +69,30 @@ sub test_get_set {
 
 	$source->uri_format('http://tile.oam.org/tiles/#Z#/#X#/#Y#.jpg');
 	is($source->uri_format, 'http://tile.oam.org/tiles/#Z#/#X#/#Y#.jpg', "set uri_format()");
+
+	# Optional tests that require Test::Exception to be installed
+	my $has_test_exception = 0;
+	eval {
+		require Test::Exception;
+		$has_test_exception = 1;
+	} or do {
+		diag("Can't load test exception $@");
+	};
 	
-	
-	# The constructor is not yet available in the perl bindings
-	throws_ok { $source->constructor } qr/\Qdesc->constructor() isn't implemented yet/, "get constructor() isn't implemented";
-	throws_ok { $source->constructor(sub{}) } qr/\Qdesc->constructor(\&code_ref)/, "set constructor() isn't implemented";
+	SKIP: {
+		skip  "Can't test for exceptions because Test::Exception is not loaded", 2 unless $has_test_exception;
+
+		# The constructor is not yet available in the perl bindings
+		Test::Exception::throws_ok(
+			sub { $source->constructor },
+			qr/\Qdesc->constructor() isn't implemented yet/,
+			"get constructor() isn't implemented"
+		);
+
+		Test::Exception::throws_ok(
+			sub { $source->constructor(sub{}) },
+			qr/\Qdesc->constructor(\&code_ref)/,
+			"set constructor() isn't implemented"
+		);
+	}
 }
