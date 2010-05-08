@@ -25,11 +25,11 @@
 
 #include "champlain/champlain-features.h"
 
-#include "champlain/champlain-memphis-tile-source.h"
-#include "champlain/champlain-map-data-source.h"
-#include "champlain/champlain-local-map-data-source.h"
-#include "champlain/champlain-network-map-data-source.h"
-#include "champlain/champlain-bounding-box.h"
+#include "champlain-memphis/champlain-memphis-tile-source.h"
+#include "champlain-memphis/champlain-map-data-source.h"
+#include "champlain-memphis/champlain-local-map-data-source.h"
+#include "champlain-memphis/champlain-network-map-data-source.h"
+#include "champlain-memphis/champlain-bounding-box.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

@@ -19,7 +19,7 @@
 
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
-#include <champlain/champlain-memphis.h>
+#include <champlain-memphis/champlain-memphis.h>
 #include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/clutter-gtk.h>
 
