@@ -20,6 +20,7 @@ champlain-gtk-@CHAMPLAIN_API_VERSION@-uninstalled.pc: champlain-gtk-uninstalled.
 endif
 
 if ENABLE_MEMPHIS
+SUBDIRS += champlain-memphis
 pcfiles += champlain-memphis-@CHAMPLAIN_API_VERSION@.pc
 champlain-memphis-@CHAMPLAIN_API_VERSION@.pc: champlain-memphis.pc
 	@cp -f $< $@

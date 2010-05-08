@@ -14,18 +14,7 @@ CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list
 
 lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
 
-if ENABLE_MEMPHIS
-memphis_headers = \
-        champlain-memphis.h \
-        champlain-memphis-tile-source.h \
-        champlain-map-data-source.h     \
-        champlain-local-map-data-source.h       \
-        champlain-network-map-data-source.h     \
-        champlain-bounding-box.h
-endif
-
 libchamplain_headers = \
-	$(memphis_headers)		\
 	champlain.h 			\
 	champlain-defines.h		\
 	champlain-point.h		\
@@ -48,20 +37,10 @@ libchamplain_headers = \
 	champlain-version.h		\
 	champlain-features.h
 
-if ENABLE_MEMPHIS
-memphis_sources = \
-        champlain-memphis-tile-source.c		\
-        champlain-map-data-source.c		\
-        champlain-local-map-data-source.c	\
-        champlain-network-map-data-source.c	\
-        champlain-bounding-box.c
-endif
-
 libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
 	$(libchamplain_headers)		\
-	$(memphis_sources)		\
 	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
@@ -86,7 +65,6 @@ noinst_HEADERS = \
 	champlain-private.h
 
 libchamplain_include_HEADERS = \
-	$(memphis_headers)		\
 	champlain.h 			\
 	champlain-view.h 		\
 	champlain-defines.h 		\
@@ -110,7 +88,7 @@ libchamplain_include_HEADERS = \
 	champlain-version.h		\
 	champlain-features.h		
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) ../tidy/libtidy-1.0.la
 
 libchamplain_includedir = $(includedir)/libchamplain-@CHAMPLAIN_API_VERSION@/champlain
 
@@ -123,7 +101,6 @@ AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
 	$(SOUP_CFLAGS)			\
 	$(SOUP_GNOME_CFLAGS)		\
-	$(MEMPHIS_CFLAGS)		\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\
@@ -180,9 +157,6 @@ champlain-enum-types.c: $(libchamplain_headers) Makefile
 
 if HAVE_INTROSPECTION
 
-if ENABLE_MEMPHIS
-memphis_gir_include = --include=Memphis-0.2
-endif
 
 BUILT_GIRSOURCES =
 
@@ -200,7 +174,6 @@ Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CH
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
-	$(memphis_gir_include) \
 	--library=champlain-@CHAMPLAIN_API_VERSION@ \
 	--libtool="$(LIBTOOL)" \
 	--output $@ \
