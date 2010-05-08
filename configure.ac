@@ -145,7 +145,7 @@ fi
 
 if test "x$enable_memphis" = "xyes"; then
   AC_CONFIG_FILES([champlain-memphis/Makefile
-                   champlain-memphis-uninstalled.pc])
+                   champlain-memphis.pc
                    champlain-memphis-uninstalled.pc])
   AC_SUBST(MEMPHIS_CFLAGS)
   AC_SUBST(MEMPHIS_LIBS)
