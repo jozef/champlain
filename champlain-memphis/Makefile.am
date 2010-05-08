@@ -51,8 +51,8 @@ libchamplain_memphis_include_HEADERS = champlain-memphis/champlain-bounding-box.
 
 libchamplain_memphis_@CHAMPLAIN_API_VERSION@_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
-AM_CPPFLAGS = $(MEMPHIS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_MEMPHIS_COMPILATION
-AM_LDFLAGS = $(MEMPHIS_LIBS) -export-symbols-regex ^champlain_memphis.*
+AM_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS) $(SOUP_GNOME_CFLAGS) $(MEMPHIS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_MEMPHIS_COMPILATION
+AM_LDFLAGS = $(DEPS_LIBS) $(SOUP_LIBS) $(SOUP_GNOME_LIBS) $(MEMPHIS_LIBS) -export-symbols-regex ^champlain_memphis.*
 
 EXTRA_DIST = $(CHAMPLAIN_MEMPHIS_MARSHAL_LIST)
 
