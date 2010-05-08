@@ -23,7 +23,7 @@
 
 #include <glib.h>
 
-#include "champlain/champlain.h"
+#include <champlain/champlain.h>
 
 #include "champlain-memphis/champlain-memphis-tile-source.h"
 #include "champlain-memphis/champlain-map-data-source.h"

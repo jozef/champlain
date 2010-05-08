@@ -29,6 +29,7 @@
 #include "champlain-local-map-data-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
+#include "champlain/champlain-debug.h"
 #include <champlain/champlain.h>
 #include "champlain-bounding-box.h"
 

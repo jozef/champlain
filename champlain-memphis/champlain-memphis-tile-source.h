@@ -20,7 +20,7 @@
 #ifndef _CHAMPLAIN_MEMPHIS_TILE_SOURCE
 #define _CHAMPLAIN_MEMPHIS_TILE_SOURCE
 
-#include <champlain/champlain-tile-source.h>
+#include <champlain/champlain.h>
 #include <champlain-memphis/champlain-map-data-source.h>
 #include <memphis/memphis.h>
 

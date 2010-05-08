@@ -40,11 +40,9 @@
 #include "champlain-memphis-tile-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
-#include "champlain-debug.h"
-#include "champlain-tile-cache.h"
-#include "champlain-defines.h"
-#include "champlain-enum-types.h"
-#include "champlain-private.h"
+#include "champlain/champlain-debug.h"
+#include <champlain/champlain.h>
+#include "champlain/champlain-private.h"
 
 #include <gdk/gdk.h>
 
