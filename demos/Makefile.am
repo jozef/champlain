@@ -31,6 +31,7 @@ noinst_PROGRAMS += local-rendering
 local_rendering_SOURCES = local-rendering.c
 local_rendering_CPPFLAGS = $(GTK_CFLAGS) $(MEMPHIS_CFLAGS)
 local_rendering_LDADD = $(GTK_LIBS) $(MEMPHIS_LIBS) $(DEPS_LIBS) \
+		../champlain-memphis/libchamplain-memphis-@CHAMPLAIN_API_VERSION@.la \
 		../champlain-gtk/libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la \
 		../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 endif
