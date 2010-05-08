@@ -16,7 +16,7 @@ libchamplain_memphis_headers = \
 	champlain-memphis.h \
 	champlain-memphis-tile-source.h
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
+libchamplain_memphis_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(CHAMPLAIN_MEMPHIS_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
 	$(libchamplain_memphis_headers)		\
@@ -46,8 +46,7 @@ champlain-memphis-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 champlain-memphis-marshal.c: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=champlain_memphis_marshal $< > $(CHAMPLAIN_MEMPHIS_MARSHAL).c
 
-libchamplain_includedir=$(includedir)/libchamplain-memphis-@CHAMPLAIN_API_VERSION@/champlain-gtk
-libchamplain_include_HEADERS = champlain-memphis.h gtk-champlain-embed.h
+libchamplain_memphis_includedir=$(includedir)/libchamplain-memphis-@CHAMPLAIN_API_VERSION@/champlain-memphis
 
 libchamplain_memphis_@CHAMPLAIN_API_VERSION@_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
