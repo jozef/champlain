@@ -34,8 +34,7 @@ libchamplain_memphis_include_HEADERS = \
 
 libchamplain_memphis_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(CHAMPLAIN_MEMPHIS_MARSHAL_LIST)		 \
-	$(BUILT_SOURCES) 			\
-	champlain-memphis-embed.c
+	$(BUILT_SOURCES)
 
 libchamplain_memphis_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(MEMPHIS_LIBS) 	\
 	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
