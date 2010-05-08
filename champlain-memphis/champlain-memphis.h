@@ -19,11 +19,11 @@
 #ifndef CHAMPLAIN_MEMPHIS_H
 #define CHAMPLAIN_MEMPHIS_H
 
-#define __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
+#define __CHAMPLAIN_MEMPHIS_CHAMPLAIN_MEMPHIS_H_INSIDE__
 
 #include <glib.h>
 
-#include "champlain/champlain-features.h"
+#include "champlain/champlain.h"
 
 #include "champlain-memphis/champlain-memphis-tile-source.h"
 #include "champlain-memphis/champlain-map-data-source.h"
@@ -31,6 +31,6 @@
 #include "champlain-memphis/champlain-network-map-data-source.h"
 #include "champlain-memphis/champlain-bounding-box.h"
 
-#undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
+#undef __CHAMPLAIN_MEMPHIS_CHAMPLAIN_MEMPHIS_H_INSIDE__
 
 #endif

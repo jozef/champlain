@@ -29,9 +29,8 @@
 #include "champlain-local-map-data-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
-#include "champlain-debug.h"
+#include <champlain/champlain.h>
 #include "champlain-bounding-box.h"
-#include "champlain-enum-types.h"
 
 #include <memphis/memphis.h>
 
