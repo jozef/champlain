@@ -39,9 +39,6 @@
 #include "champlain-debug.h"
 
 #include "champlain.h"
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-#include "champlain-memphis.h"
-#endif
 #include "champlain-file-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
@@ -80,11 +77,6 @@ struct _ChamplainMapSourceFactoryPrivate
 
 static ChamplainMapSource * champlain_map_source_new_generic (
     ChamplainMapSourceDesc *desc, gpointer data);
-
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-static ChamplainMapSource * champlain_map_source_new_memphis (
-    ChamplainMapSourceDesc *desc, gpointer user_data);
-#endif
 
 static void
 champlain_map_source_factory_get_property (GObject *object,
@@ -257,37 +249,6 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     NULL
   };
 
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-static
-ChamplainMapSourceDesc MEMPHIS_LOCAL_DESC =
-  {
-    CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL,
-    "OpenStreetMap Memphis Local Map",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
-    12,
-    18,
-    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_memphis,
-    "",
-    NULL
-  };
-
-static
-ChamplainMapSourceDesc MEMPHIS_NETWORK_DESC =
-  {
-    CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK,
-    "OpenStreetMap Memphis Network Map",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
-    12,
-    18,
-    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_memphis,
-    "",
-    NULL
-  };
-#endif
 
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
@@ -312,12 +273,6 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 #endif
   champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
       MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-  champlain_map_source_factory_register (factory, &MEMPHIS_LOCAL_DESC,
-      MEMPHIS_LOCAL_DESC.constructor, MEMPHIS_LOCAL_DESC.data);
-  champlain_map_source_factory_register (factory, &MEMPHIS_NETWORK_DESC,
-      MEMPHIS_NETWORK_DESC.constructor, MEMPHIS_NETWORK_DESC.data);
-#endif
 }
 
 /**
@@ -462,39 +417,4 @@ champlain_map_source_new_generic (
       desc->projection,
       desc->uri_format));
 }
-
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-static ChamplainMapSource *
-champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
-    gpointer user_data)
-{
-  ChamplainMapDataSource *map_data_source;
-
-  if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
-    {
-      map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_local_map_data_source_new ());
-
-      /* Abuse the uri_format field to store an initial data path (optional) */
-      if (desc->uri_format && g_strcmp0 (desc->uri_format, "") != 0)
-        champlain_local_map_data_source_load_map_data (
-            CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (map_data_source),
-            desc->uri_format);
-    }
-  else if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK) == 0)
-      map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_network_map_data_source_new ());
-  else
-    return NULL;
-
-  return CHAMPLAIN_MAP_SOURCE (champlain_memphis_tile_source_new_full (
-      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      map_data_source));
-}
-#endif
 
