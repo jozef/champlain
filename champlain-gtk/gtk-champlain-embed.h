@@ -17,7 +17,7 @@
  */
  
 #if !defined (__CHAMPLAIN_GTK_CHAMPLAIN_GTK_H_INSIDE__) && !defined (CHAMPLAIN_GTK_COMPILATION)
-#error "Only <champlain/champlain.h> can be included directly."
+#error "Only <champlain-gtk/champlain-gtk.h> can be included directly."
 #endif
 
 #ifndef GTK_CHAMPLAIN_EMBED_H
