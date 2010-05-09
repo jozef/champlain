@@ -1,5 +1,10 @@
 Revision history for Champlain
 
+0.12 Sun May  9 17:26:58 CEST 2010
+	API coverage for libchamplain 0.5.1.
+	Includes Memphis support (local rendering).
+
+
 0.11 Sat Jan  9 10:48:45 CET 2010
 	API coverage for libchamplain 0.4.3.
 
