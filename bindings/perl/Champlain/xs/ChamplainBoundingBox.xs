@@ -31,22 +31,22 @@ left (ChamplainBoundingBox *box, ...)
 		switch (ix) {
 			case 0:
 				RETVAL = newSVnv(box->left);
-				if (items > 1) box->left = (gdouble)SvNV(ST(1));
+				if (items > 1) box->left = (gdouble) SvNV(ST(1));
 			break;
 			
 			case 1:
 				RETVAL = newSVnv(box->bottom);
-				if (items > 1) box->bottom = (gdouble)SvNV(ST(1));
+				if (items > 1) box->bottom = (gdouble) SvNV(ST(1));
 			break;
 			
 			case 2:
 				RETVAL = newSVnv(box->right);
-				if (items > 1) box->right = (gdouble)SvNV(ST(1));
+				if (items > 1) box->right = (gdouble) SvNV(ST(1));
 			break;
 			
 			case 3:
 				RETVAL = newSVnv(box->top);
-				if (items > 1) box->top = (gdouble)SvNV(ST(1));
+				if (items > 1) box->top = (gdouble) SvNV(ST(1));
 			break;
 			
 			default:
@@ -65,7 +65,7 @@ champlain_bounding_box_get_center (ChamplainBoundingBox *box)
 		gdouble lat, lon;
 	
 	PPCODE:
-		champlain_bounding_box_get_center (box, &lat, &lon);
-		EXTEND (SP, 2);
-		PUSHs (sv_2mortal (newSVnv (lat)));
-		PUSHs (sv_2mortal (newSVnv (lon)));
+		champlain_bounding_box_get_center(box, &lat, &lon);
+		EXTEND(SP, 2);
+		PUSHs(sv_2mortal(newSVnv(lat)));
+		PUSHs(sv_2mortal(newSVnv(lon)));
