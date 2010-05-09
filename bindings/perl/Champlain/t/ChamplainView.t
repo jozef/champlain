@@ -300,11 +300,11 @@ sub test_go_to {
 	
 	# Go to a different place. This is too fast and can't be tested properly.
 	$view->go_to($latitude, $longitude);
+	my $stop_called;
+	$view->signal_connect('animation-completed::go-to', sub { $stop_called = 1 });
 	Glib::Idle->add(sub {$view->stop_go_to()});
 	run_animation_loop($view);
-
-	is($view->get('latitude'), 0, "stop_go_to() at latitude 0");
-	is($view->get('longitude'), 0, "stop_go_to() at longitude 0");
+	ok($stop_called, "stop_go_to called");
 }
 
 
