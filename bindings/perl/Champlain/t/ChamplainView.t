@@ -366,8 +366,17 @@ sub test_ensure_visible {
 # Test ensure_markers_visible().
 #
 sub test_ensure_markers_visible {
+
+	# Must add the view to a stage and give a size for this test
+	my $stage = Clutter::Stage->get_default();
+	$stage->set_size(400, 400);
+
 	my $view = Champlain::View->new();
 	isa_ok($view, 'Champlain::View');
+
+	$stage->add($view);
+	$view->set_size($stage->get_size);
+
 
 	# Place the view in the center and zoomed
 	$view->center_on(0, 0);
@@ -388,11 +397,7 @@ sub test_ensure_markers_visible {
 		$layer->add($marker);
 	}
 	$view->add_layer($layer);
-
-	# Must add the view to a stage and give a size for this test
-	my $stage = Clutter::Stage->get_default();
-	$stage->add($view);
-	$view->set_size(400, 400);
+	$view->show_all();
 
 	$view->ensure_markers_visible(\@markers, TRUE);
 	run_animation_loop($view);
@@ -441,8 +446,8 @@ sub run_animation_loop {
 		$stage->add($view);
 		$stage->set_size(400, 400);
 		$view->set_size($stage->get_size);
-		$stage->show_all() if @ARGV;
 	}
+	Clutter::Stage->get_default->show_all() if @ARGV;
 
 
 	# Give us a bit of time to get there since this is an animation and it
