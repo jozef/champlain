@@ -31,8 +31,7 @@ sub main {
 
 	eval {
 		%pkgconfig = ExtUtils::PkgConfig->find("champlain-$champlain_version");
-		# All XS files that start with Champlain are for libchamplain
-		push @XS_FILES, <xs/Champlain*.xs>;
+		push @XS_FILES, Glib::MakeHelper->read_source_list_file('xs-champlain');
 		push @typemaps, 'maps';
 		push @deps, 'Clutter';
 	};
