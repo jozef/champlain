@@ -1,3 +1,4 @@
 xs/ChamplainBoundingBox.xs
 xs/ChamplainLocalMapDataSource.xs
+xs/ChamplainMapDataSource.xs
 xs/ChamplainNetworkMapDataSource.xs
