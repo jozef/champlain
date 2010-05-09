@@ -249,6 +249,7 @@ sub test_event {
 	$view->set_size($size, $size);
 	$view->center_on(0, 0);
 	$stage->add($view);
+	$stage->show_all();
 	
 	# Create a fake event in the middle of the tile
 	my $event = Clutter::Event->new('button_press');
