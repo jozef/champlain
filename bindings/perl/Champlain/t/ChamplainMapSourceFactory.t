@@ -74,7 +74,7 @@ sub test_map_factory {
 	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
 
-	my $source = $factory->create_cached_source('cached');
+	my $source = $factory->create_cached_source(Champlain::MapSourceFactory->MFF_RELIEF);
 	isa_ok($source, 'Champlain::MapSource');
 }
 
