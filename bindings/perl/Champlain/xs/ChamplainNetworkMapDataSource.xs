@@ -1,7 +1,7 @@
 #include "champlain-perl.h"
 
 
-MODULE = Champlain::NetworkMapDataSource  PACKAGE = Champlain::NetworkMapDataSource  PREFIX = champlain_error_tile_source_
+MODULE = Champlain::NetworkMapDataSource  PACKAGE = Champlain::NetworkMapDataSource  PREFIX = champlain_network_map_data_source_
 
 
 
