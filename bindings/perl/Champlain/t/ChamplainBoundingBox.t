@@ -15,7 +15,7 @@ sub tests {
 		plan skip_all => "No support for memphis";
 		return 0;
 	}
-	plan tests => 8;
+	plan tests => 9;
 	
 	Clutter->init();
 
@@ -34,6 +34,12 @@ sub tests {
 
 	$box->top(40);
 	is($box->top, 40, "top");
+
+	is_deeply(
+		[ $box->get_center ],
+		[ ($box->right + $box->left)/2, ($box->top + $box->bottom)/2 ],
+		"get_center"
+	);
 
 	my $copy = $box->copy;
 	isa_ok($copy, 'Champlain::BoundingBox');
