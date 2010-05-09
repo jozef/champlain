@@ -53,3 +53,16 @@ CHECK_VERSION (class, int major, int minor, int micro)
 
 	OUTPUT:
 		RETVAL
+
+
+gboolean
+HAS_MEMPHIS ()
+	CODE:
+#ifdef CHAMPLAIN_HAS_MEMPHIS
+		RETVAL = TRUE;
+#else
+		RETVAL = FALSE;
+#endif
+
+	OUTPUT:
+		RETVAL
