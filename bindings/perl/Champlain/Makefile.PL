@@ -40,8 +40,22 @@ sub main {
 		return;
 	}
 	
-	$DEPENDS = ExtUtils::Depends->new('Champlain', @deps);
+	# If libchamplain was compiled with memphis support
+	eval {
+		my %conf = ExtUtils::PkgConfig->find("champlain-memphis-$champlain_version");
+		$pkgconfig{cflags} .= $conf{cflags} . ' -DCHAMPLAINPERL_MEMPHIS';
+		$pkgconfig{libs} .= $conf{libs};
+
+		push @XS_FILES, Glib::MakeHelper->read_source_list_file('xs-memphis');
+		push @typemaps, 'maps-memphis';
+#		push @deps, 'Memphis';
+	};
+	if (my $error = $@) {
+		warn "Ignoring the Memphis bindings ($error)";
+	}
+
 	
+	$DEPENDS = ExtUtils::Depends->new('Champlain', @deps);
 	$DEPENDS->add_pm(
 		File::Spec->catfile('lib', 'Champlain.pm'),
 		File::Spec->catfile('$(INST_LIBDIR)', 'Champlain.pm'),

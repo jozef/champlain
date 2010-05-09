@@ -4,6 +4,10 @@
 
 #include <champlain/champlain.h>
 
+#ifdef CHAMPLAINPERL_MEMPHIS
+#include <champlain/champlain-memphis.h>
+#endif
+
 #include "champlain-autogen.h"
 
 #endif /* _CHAMPLAIN_PERL_H_ */
