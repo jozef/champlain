@@ -6,7 +6,7 @@ MODULE = Champlain::MemphisTileSource  PACKAGE = Champlain::MemphisTileSource  P
 
 ChamplainMemphisTileSource*
 champlain_memphis_tile_source_new_full (class, const gchar *id, const gchar *name, const gchar *license, const gchar *license_uri, guint min_zoom, guint max_zoom, guint tile_size, ChamplainMapProjection projection, ChamplainMapDataSource *map_data_source)
-	C_ARGS: id, name, license, license_uri, min_zoom, max_zoom, tile_size, projection, map_data_source)
+	C_ARGS: id, name, license, license_uri, min_zoom, max_zoom, tile_size, projection, map_data_source
 
 
 void
@@ -46,7 +46,8 @@ champlain_memphis_tile_source_get_rule_ids (ChamplainMemphisTileSource *tile_sou
 			XPUSHs(sv_2mortal(newSVGChar(id)));
 		}
 
-		g_slist_free(list);
+		g_list_free(list);
+
 
 void
 champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source, MemphisRule *rule)
