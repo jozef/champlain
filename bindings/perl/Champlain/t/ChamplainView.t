@@ -12,6 +12,9 @@ exit tests();
 
 
 sub tests {
+	my $stage = Clutter::Stage->get_default();
+	$stage->set_size(400, 400);
+
 	test_go_to();
 	test_ensure_visible();
 	test_ensure_markers_visible();
@@ -277,6 +280,12 @@ sub test_go_to {
 	my $view = Champlain::View->new();
 	isa_ok($view, 'Champlain::View');
 
+	my $stage = Clutter::Stage->get_default();
+	$stage->remove_all();
+	$view->set_size($stage->get_size);
+	$stage->add($view);
+	$stage->show_all();
+
 	# Set a proper zoom-level otherwise the test will fail because we would be
 	# zoomed in Antartica.
 	$view->set_property("zoom-level", 4);
@@ -372,7 +381,6 @@ sub test_ensure_markers_visible {
 	# Must add the view to a stage and give a size for this test
 	my $stage = Clutter::Stage->get_default();
 	$stage->remove_all();
-	$stage->set_size(400, 400);
 
 	my $view = Champlain::View->new();
 	isa_ok($view, 'Champlain::View');
@@ -448,7 +456,6 @@ sub run_animation_loop {
 		my $stage = Clutter::Stage->get_default();
 		$stage->remove_all();
 		$stage->add($view);
-		$stage->set_size(400, 400);
 		$view->set_size($stage->get_size);
 	}
 	Clutter::Stage->get_default->show_all() if @ARGV;
