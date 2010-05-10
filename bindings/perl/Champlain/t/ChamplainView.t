@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 88;
+use Clutter::TestHelper tests => 87;
 
 use Champlain ':coords';
 
