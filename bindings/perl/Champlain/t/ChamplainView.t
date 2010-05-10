@@ -432,8 +432,14 @@ sub is_view_near {
 	my $delta_latitude = $current_latitude - $latitude;
 	my $delta_longitude = $current_longitude - $longitude;
 	my $tester = Test::Builder->new();
-	$tester->ok($delta_latitude >= -$delta && $delta_latitude <= $delta, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
-	$tester->ok($delta_longitude >= -$delta && $delta_longitude <= $delta, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
+	$tester->ok(
+		$delta_latitude >= -$delta && $delta_latitude <= $delta,
+		"ensure_visible() changed latitude close enough (delta: $delta_latitude; +/-$delta; $current_latitude ~ $latitude)"
+	);
+	$tester->ok(
+		$delta_longitude >= -$delta && $delta_longitude <= $delta,
+		"ensure_visible() changed longitude close enough (delta: $delta_longitude; +/-$delta; $current_longitude ~ $longitude)"
+	);
 }
 
 
