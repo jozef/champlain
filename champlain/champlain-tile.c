@@ -513,6 +513,7 @@ fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
 {
   if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
     clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+  g_object_unref (self);
 }
 
 /**
@@ -560,6 +561,7 @@ champlain_tile_set_state (ChamplainTile *self,
               "opacity", 255,
               NULL);
         }
+      g_object_ref (self);
 
       g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
     }
