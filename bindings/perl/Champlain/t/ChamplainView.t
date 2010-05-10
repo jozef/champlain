@@ -298,8 +298,7 @@ sub test_go_to {
 	
 	# Go to a different place
 	my ($latitude, $longitude) = (48.218611, 17.146397);
-	$view->go_to($latitude, $longitude);
-	run_animation_loop($view);
+	run_animation_loop($view, sub { $view->go_to($latitude, $longitude); });
 	
 	# Check if we got somewhere close to desired location
 	is_view_near($view, $latitude, $longitude);
@@ -313,8 +312,7 @@ sub test_go_to {
 	$view->go_to($latitude, $longitude);
 	my $stop_called;
 	$view->signal_connect('animation-completed::go-to', sub { $stop_called = 1 });
-	Glib::Idle->add(sub {$view->stop_go_to()});
-	run_animation_loop($view);
+	run_animation_loop($view, sub { Glib::Idle->add(sub {$view->stop_go_to()}); });
 	ok($stop_called, "stop_go_to called");
 }
 
@@ -358,13 +356,14 @@ sub test_ensure_visible {
 	my (@marker1) = (48.218611, 17.146397);
 	my (@marker2) = (48.21066, 16.31476);
 
-	# Must start the animations from the event loop
-	Glib::Idle->add(sub {
-		diag("Start ensure visible");
-		$view->ensure_visible(@marker1, @marker2, TRUE);
-		return FALSE;
+	run_animation_loop($view, sub {
+		# Must start the animations from the event loop
+		Glib::Idle->add(sub {
+			diag("Start ensure visible");
+			$view->ensure_visible(@marker1, @marker2, TRUE);
+			return FALSE;
+		});
 	});
-	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
 	my $middle_latitude = ($marker1[0] + $marker2[0]) / 2;
@@ -408,10 +407,11 @@ sub test_ensure_markers_visible {
 		$layer->add($marker);
 	}
 	$view->add_layer($layer);
-	$view->show_all();
 
-	$view->ensure_markers_visible(\@markers, TRUE);
-	run_animation_loop($view);
+	# Must display the stage otherwise the test will fail
+	$stage->show_all();
+
+	run_animation_loop($view, sub { $view->ensure_markers_visible(\@markers, TRUE); });
 	
 	# Check if we got somewhere close to the middle of the markers
 	is_view_near($view, 48.0, 16.5, 5.0);
@@ -436,6 +436,7 @@ sub is_view_near {
 		$delta_latitude >= -$delta && $delta_latitude <= $delta,
 		"ensure_visible() changed latitude close enough (delta: $delta_latitude; +/-$delta; $current_latitude ~ $latitude)"
 	);
+
 	$tester->ok(
 		$delta_longitude >= -$delta && $delta_longitude <= $delta,
 		"ensure_visible() changed longitude close enough (delta: $delta_longitude; +/-$delta; $current_longitude ~ $longitude)"
@@ -456,16 +457,19 @@ sub create_marker {
 # timed in case where the test doesn't work.
 #
 sub run_animation_loop {
-	my ($view) = @_;
+	my ($view, $code) = @_;
 
-	if (!$view->get_stage) {
-		my $stage = Clutter::Stage->get_default();
+	my $stage = $view->get_stage;
+	if (!$stage) {
+		$stage = Clutter::Stage->get_default();
 		$stage->remove_all();
 		$stage->add($view);
 		$view->set_size($stage->get_size);
 	}
-	Clutter::Stage->get_default->show_all() if @ARGV;
+	$stage->show_all();
+	$stage->hide_all() unless @ARGV;
 
+	$code->();
 
 	# Give us a bit of time to get there since this is an animation and it
 	# requires an event loop. We add an idle timeout in order to make sure that
