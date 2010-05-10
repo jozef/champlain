@@ -500,7 +500,7 @@ static void
 fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
 {
   if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
-    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+    g_object_unref (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
 }
 
 /**
@@ -703,7 +703,7 @@ champlain_tile_set_content (ChamplainTile *self,
 
   if (priv->content_actor &&
       clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
-    clutter_actor_destroy (priv->content_actor);
+    g_object_unref (priv->content_actor);
 
   priv->content_actor = actor;
 
