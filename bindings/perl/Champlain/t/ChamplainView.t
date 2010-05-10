@@ -246,6 +246,7 @@ sub test_event {
 	# NOTE: At the moment this works only if the view is in a stage and if
 	# show_all() was called
 	my $stage = Clutter::Stage->get_default();
+	$stage->remove_all();
 	$view->set_size($size, $size);
 	$view->center_on(0, 0);
 	$stage->add($view);
@@ -370,6 +371,7 @@ sub test_ensure_markers_visible {
 
 	# Must add the view to a stage and give a size for this test
 	my $stage = Clutter::Stage->get_default();
+	$stage->remove_all();
 	$stage->set_size(400, 400);
 
 	my $view = Champlain::View->new();
@@ -444,6 +446,7 @@ sub run_animation_loop {
 
 	if (!$view->get_stage) {
 		my $stage = Clutter::Stage->get_default();
+		$stage->remove_all();
 		$stage->add($view);
 		$stage->set_size(400, 400);
 		$view->set_size($stage->get_size);
