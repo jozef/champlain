@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 45;
+use Clutter::TestHelper tests => 53;
 
 use Champlain ':maps';
 
@@ -26,6 +26,16 @@ sub test_map_source_names {
 	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'osm-cyclemap');
 	is(Champlain::MapSourceFactory->OAM, 'oam');
 	is(Champlain::MapSourceFactory->MFF_RELIEF, 'mff-relief');
+
+	if (Champlain::HAS_MEMPHIS) {
+		is(Champlain::MapSourceFactory->MEMPHIS_LOCAL_DESC, 'memphis-local');
+		is(Champlain::MapSourceFactory->MEMPHIS_NETWORK_DESC, 'memphis-network');
+	}
+	else {
+		SKIP: {
+			skip "Memphis not available", 2;
+		}
+	}
 }
 
 
@@ -69,7 +79,19 @@ sub test_map_factory {
 		Champlain::MapSourceFactory->MFF_RELIEF,
 		"Maps for Free Relief"
 	);
-	
+
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->MEMPHIS_LOCAL_DESC,
+		"OpenStreetMap Memphis Local Map"
+	);
+
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->MEMPHIS_NETWORK_DESC,
+		"OpenStreetMap Memphis Network Map"
+	);
+
 	# Get the maps available
 	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
