@@ -410,6 +410,7 @@ sub test_ensure_markers_visible {
 
 	# Must display the stage otherwise the test will fail
 	$stage->show_all();
+	$stage->hide_all();
 
 	run_animation_loop($view, sub { $view->ensure_markers_visible(\@markers, TRUE); });
 	
