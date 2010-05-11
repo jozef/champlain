@@ -82,26 +82,6 @@ champlain_tile_get_modified_time (ChamplainTile *self)
 		}
 
 
-SV*
-champlain_tile_get_modified_time_string (ChamplainTile *self)
-	PREINIT:
-		gchar *string = NULL;
-
-	CODE:
-		string = champlain_tile_get_modified_time_string(self);
-		if (string) {
-			RETVAL = newSVpvn(string, 0);
-			g_free(string);
-		}
-		else {
-			RETVAL = &PL_sv_undef;
-		}
-
-	OUTPUT:
-		RETVAL
-
-
-
 void
 champlain_tile_set_content (ChamplainTile *self, ClutterActor* actor)
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 48;
+use Clutter::TestHelper tests => 46;
 
 use Champlain ':coords';
 use Data::Dumper;
@@ -34,7 +34,6 @@ sub test_new_full {
 		[undef, undef],
 		"get_modified_time() full tile"
 	);
-	is($tile->get_modified_time_string(), undef, "get_modified_time_string() full tile");
 
 	test_all_setters($tile);
 }
@@ -56,7 +55,6 @@ sub test_new_empty {
 		[undef, undef],
 		"get_modified_time() full tile"
 	);
-	is($tile->get_modified_time_string(), undef, "get_modified_time_string() full tile");
 	
 	test_all_setters($tile);
 }
