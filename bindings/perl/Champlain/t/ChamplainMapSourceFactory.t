@@ -24,7 +24,7 @@ sub test_map_source_names {
 	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'osm-mapnik');
 	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'osm-osmarender');
 	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'osm-cyclemap');
-	is(Champlain::MapSourceFactory->OAM, 'oam');
+	is(Champlain::MapSourceFactory->OAM, 'OpenAerialMap');
 	is(Champlain::MapSourceFactory->MFF_RELIEF, 'mff-relief');
 
 	if (Champlain::HAS_MEMPHIS) {
