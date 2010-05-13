@@ -118,7 +118,7 @@ sub MY::postamble {
 	$postamble .= Glib::MakeHelper->postamble_docs_full(
 		DEPENDS   => $DEPENDS,
 		XS_FILES  => [ @XS_FILES ],
-		COPYRIGHT => 'Copyright (C) 2009 by Emmanuel Rodriguez'
+		COPYRIGHT => 'Copyright (C) 2009-2010 by Emmanuel Rodriguez'
 	);
 
 	return $postamble;
