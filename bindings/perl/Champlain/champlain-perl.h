@@ -5,6 +5,7 @@
 #include <champlain/champlain.h>
 
 #ifdef CHAMPLAINPERL_MEMPHIS
+#include <memphis-perl.h>
 #include <champlain/champlain-memphis.h>
 #endif
 

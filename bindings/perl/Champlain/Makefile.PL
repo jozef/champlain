@@ -28,12 +28,14 @@ sub main {
 	my @typemaps = ();
 	my @deps = ('Glib');
 	my %pkgconfig;
+	my %requires;
 
 	eval {
 		%pkgconfig = ExtUtils::PkgConfig->find("champlain-$champlain_version");
 		push @XS_FILES, Glib::MakeHelper->read_source_list_file('xs-champlain');
 		push @typemaps, 'maps';
 		push @deps, 'Clutter';
+		$requires{Clutter} = '1.000';
 	};
 	if (my $error = $@) {
 		warn "FAIL: ", $error;
@@ -48,12 +50,17 @@ sub main {
 
 		push @XS_FILES, Glib::MakeHelper->read_source_list_file('xs-memphis');
 		push @typemaps, 'maps-memphis';
-#		push @deps, 'Memphis';
+		push @deps, 'Memphis';
+		$requires{Memphis} = '0.01';
 	};
 	if (my $error = $@) {
 		warn "Ignoring the Memphis bindings ($error)";
 	}
 
+	foreach my $module (keys %requires) {
+		my $version = $requires{$module};
+		eval "use $module '$version'; 1;" or die "Can't load $module $version\n";
+	}
 	
 	$DEPENDS = ExtUtils::Depends->new('Champlain', @deps);
 	$DEPENDS->add_pm(
@@ -91,7 +98,7 @@ sub main {
 		LICENSE       => 'perl, lgpl',
 
 		PREREQ_PM     => {
-			'Clutter' => '1.0000',
+			%requires,
 		},
 		PREREQ_FATAL  => 1, # Clutter is mandatory otherwise the Makefile can't be created
 		
