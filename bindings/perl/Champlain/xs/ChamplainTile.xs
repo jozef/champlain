@@ -123,6 +123,10 @@ champlain_tile_set_modified_time (ChamplainTile *self, ...)
 		champlain_tile_set_modified_time(self, &modified_time);
 
 
+gchar*
+champlain_tile_get_modified_time_string (ChamplainTile *self)
+
+
 void
 champlain_tile_set_fade_in (ChamplainTile *self, gboolean fade_in)
 

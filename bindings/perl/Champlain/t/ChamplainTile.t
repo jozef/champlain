@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 46;
+use Clutter::TestHelper tests => 50;
 
 use Champlain ':coords';
 use Data::Dumper;
@@ -34,6 +34,11 @@ sub test_new_full {
 		[undef, undef],
 		"get_modified_time() full tile"
 	);
+	is(
+		$tile->get_modified_time_string,
+		undef,
+		"get_modified_time_stirng"
+	);
 
 	test_all_setters($tile);
 }
@@ -55,6 +60,12 @@ sub test_new_empty {
 		[undef, undef],
 		"get_modified_time() full tile"
 	);
+	is(
+		$tile->get_modified_time_string,
+		undef,
+		"get_modified_time_stirng"
+	);
+
 	
 	test_all_setters($tile);
 }
@@ -91,6 +102,11 @@ sub test_all_setters {
 	is(scalar(@time), 2, "Got seconds and microseconds");
 	ok(defined $time[0], "Seconds are defined");
 	ok(defined $time[1], "Microseconds are defined");
+	ok(
+		$tile->get_modified_time_string,
+		"get_modified_time_stirng"
+	);
+
 	
 	# The epoch
 	$tile->set_modified_time(0, 0);
